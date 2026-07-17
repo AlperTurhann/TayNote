@@ -1,12 +1,16 @@
 import { configureStore } from '@reduxjs/toolkit';
 
+import { errorAlertMiddleware } from '@/lib/errorMiddleware';
+import columnReducer from '@/slices/columnSlice';
 import taskReducer from '@/slices/taskSlice';
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
-      task: taskReducer
-    }
+      task: taskReducer,
+      column: columnReducer
+    },
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(errorAlertMiddleware)
   });
 };
 

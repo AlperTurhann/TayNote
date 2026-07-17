@@ -5,11 +5,11 @@ import java.util.UUID;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -26,9 +26,9 @@ public class Task {
     @Column(nullable = false)
     private String color;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Status status;
+    @ManyToOne
+    @JoinColumn(name = "column_id", nullable = false)
+    private BoardColumn column;
 
     @Column(nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
@@ -57,12 +57,12 @@ public class Task {
         this.color = color;
     }
 
-    public Status getStatus() {
-        return status;
+    public BoardColumn getColumn() {
+        return column;
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
+    public void setColumn(BoardColumn column) {
+        this.column = column;
     }
 
     public Instant getCreatedAt() {

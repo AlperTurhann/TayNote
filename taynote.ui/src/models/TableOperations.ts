@@ -5,6 +5,7 @@ interface TableOpertions {
   pageIndex: number;
   pageSize: number;
   query: string;
+  columnId?: string;
 }
 
 export type { SortingType, TableOpertions };

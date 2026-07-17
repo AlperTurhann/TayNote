@@ -1,0 +1,10 @@
+package com.taynote.api.exception;
+
+import java.util.UUID;
+
+public class ColumnNotFoundException extends RuntimeException {
+
+    public ColumnNotFoundException(UUID id) {
+        super("Column not found: " + id);
+    }
+}

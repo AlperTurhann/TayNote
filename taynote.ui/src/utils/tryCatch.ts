@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 type TryCatchResult<T> = { error: string | null; data: T | null };
 
 const tryCatch = async <T>(
@@ -10,7 +12,10 @@ const tryCatch = async <T>(
   } catch (error) {
     let err: string;
 
-    if (error instanceof Error) err = error.message;
+    const backendMessage = axios.isAxiosError(error) ? error.response?.data?.message : undefined;
+
+    if (typeof backendMessage === 'string') err = backendMessage;
+    else if (error instanceof Error) err = error.message;
     else if (typeof error === 'string') err = error;
     else err = 'Unexpected Error';
 

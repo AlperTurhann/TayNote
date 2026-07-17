@@ -1,31 +1,50 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { DEFAULT_TABLE_OPERATIONS } from '@/constants/generalConstants';
 import { FetchOperations } from '@/models/FetchOperations';
-import { TableOpertions } from '@/models/TableOperations';
 import { Task } from '@/models/Task';
 import {
   addTaskAsync,
-  changeTaskStatusAsync,
+  changeTaskColumnAsync,
   deleteTaskAsync,
   getTasksAsync
-} from '@/services/task/services';
+} from '@/services/taskService';
+
+interface ColumnTasksState {
+  tasks: Task[];
+  pageIndex: number;
+  hasMore: boolean;
+  isLoading: boolean;
+  error?: string;
+}
 
 interface TaskState {
-  tasks: Task[];
-  activeTableOperations: TableOpertions;
-  getTasks: FetchOperations;
+  byColumn: Record<string, ColumnTasksState>;
   addTask: FetchOperations;
   updateTask: FetchOperations;
   deleteTask: FetchOperations;
 }
 
-const initialState: TaskState = {
+const emptyColumnTasksState = (): ColumnTasksState => ({
   tasks: [],
-  activeTableOperations: DEFAULT_TABLE_OPERATIONS,
-  getTasks: {
-    isLoading: false
-  },
+  pageIndex: 0,
+  hasMore: true,
+  isLoading: false
+});
+
+const getOrCreateColumnState = (state: TaskState, columnId: string): ColumnTasksState => {
+  if (!state.byColumn[columnId]) {
+    state.byColumn[columnId] = emptyColumnTasksState();
+  }
+  return state.byColumn[columnId];
+};
+
+const findColumnStateByTaskId = (state: TaskState, taskId: string) =>
+  Object.values(state.byColumn).find((columnState) =>
+    columnState.tasks.some((task) => task.id === taskId)
+  );
+
+const initialState: TaskState = {
+  byColumn: {},
   addTask: {
     isLoading: false
   },
@@ -44,13 +63,21 @@ const taskSlice = createSlice({
   extraReducers: (builder) => {
     //#region Get Tasks
     builder
-      .addCase(getTasksAsync.pending, (state) => {
-        state.getTasks.isLoading = true;
+      .addCase(getTasksAsync.pending, (state, action) => {
+        const { columnId } = action.meta.arg;
+        if (!columnId) return;
+        getOrCreateColumnState(state, columnId).isLoading = true;
       })
       .addCase(getTasksAsync.fulfilled, (state, action) => {
-        state.tasks = action.payload.data ?? [];
-        state.getTasks.isLoading = false;
-        state.getTasks.error = action.payload.error ?? undefined;
+        const { columnId, pageIndex } = action.meta.arg;
+        if (!columnId) return;
+        const columnState = getOrCreateColumnState(state, columnId);
+        const { items, hasMore } = action.payload.data ?? { items: [], hasMore: false };
+        columnState.tasks = pageIndex <= 1 ? items : [...columnState.tasks, ...items];
+        columnState.pageIndex = pageIndex;
+        columnState.hasMore = hasMore;
+        columnState.isLoading = false;
+        columnState.error = action.payload.error ?? undefined;
       });
     //#endregion
     //#region Add Task
@@ -59,20 +86,29 @@ const taskSlice = createSlice({
         state.addTask.isLoading = true;
       })
       .addCase(addTaskAsync.fulfilled, (state, action) => {
-        if (action.payload.data) state.tasks.push(action.payload.data);
+        const task = action.payload.data;
+        if (task) {
+          getOrCreateColumnState(state, task.columnId).tasks.push(task);
+        }
         state.addTask.isLoading = false;
         state.addTask.error = action.payload.error ?? undefined;
       });
     //#endregion
-    //#region Change Task Status
+    //#region Change Task Column
     builder
-      .addCase(changeTaskStatusAsync.pending, (state) => {
+      .addCase(changeTaskColumnAsync.pending, (state) => {
         state.updateTask.isLoading = true;
       })
-      .addCase(changeTaskStatusAsync.fulfilled, (state, action) => {
-        if (action.payload.data) {
-          const task = state.tasks.find((task) => task.id === action.payload.data!.id);
-          if (task) task.status = action.payload.data.status;
+      .addCase(changeTaskColumnAsync.fulfilled, (state, action) => {
+        const result = action.payload.data;
+        if (result) {
+          const sourceColumnState = findColumnStateByTaskId(state, result.id);
+          const taskIndex = sourceColumnState?.tasks.findIndex((task) => task.id === result.id);
+          if (sourceColumnState && taskIndex !== undefined && taskIndex !== -1) {
+            const [movedTask] = sourceColumnState.tasks.splice(taskIndex, 1);
+            movedTask.columnId = result.columnId;
+            getOrCreateColumnState(state, result.columnId).tasks.push(movedTask);
+          }
         }
         state.updateTask.isLoading = false;
         state.updateTask.error = action.payload.error ?? undefined;
@@ -84,7 +120,13 @@ const taskSlice = createSlice({
         state.deleteTask.isLoading = true;
       })
       .addCase(deleteTaskAsync.fulfilled, (state, action) => {
-        state.tasks = state.tasks.filter((task) => task.id !== action.payload.data);
+        const taskId = action.payload.data;
+        if (taskId) {
+          const columnState = findColumnStateByTaskId(state, taskId);
+          if (columnState) {
+            columnState.tasks = columnState.tasks.filter((task) => task.id !== taskId);
+          }
+        }
         state.deleteTask.isLoading = false;
         state.deleteTask.error = action.payload.error ?? undefined;
       });
@@ -92,6 +134,7 @@ const taskSlice = createSlice({
   }
 });
 
-export const selectTasks = (state: { task: TaskState }) => state.task.tasks;
+export const selectColumnTasks = (columnId: string) => (state: { task: TaskState }) =>
+  state.task.byColumn[columnId] ?? emptyColumnTasksState();
 
 export default taskSlice.reducer;

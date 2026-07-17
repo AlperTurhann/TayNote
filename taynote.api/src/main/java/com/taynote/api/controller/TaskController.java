@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,11 +16,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.taynote.api.dto.ChangeTaskStatusResponse;
+import com.taynote.api.dto.ChangeTaskColumnResponse;
 import com.taynote.api.dto.CreateTaskRequest;
 import com.taynote.api.dto.TableOperationsRequest;
 import com.taynote.api.dto.TaskDto;
-import com.taynote.api.dto.UpdateStatusRequest;
+import com.taynote.api.dto.TaskSearchResponse;
+import com.taynote.api.dto.UpdateTaskColumnRequest;
 import com.taynote.api.entity.Task;
 import com.taynote.api.mapper.TaskMapper;
 import com.taynote.api.service.TaskService;
@@ -35,8 +37,10 @@ public class TaskController {
     }
 
     @PostMapping("/search")
-    public List<TaskDto> search(@RequestBody TableOperationsRequest request) {
-        return taskService.search(request).stream().map(TaskMapper::toDto).collect(Collectors.toList());
+    public TaskSearchResponse search(@RequestBody TableOperationsRequest request) {
+        Page<Task> page = taskService.search(request);
+        List<TaskDto> items = page.getContent().stream().map(TaskMapper::toDto).collect(Collectors.toList());
+        return new TaskSearchResponse(items, page.hasNext());
     }
 
     @PostMapping
@@ -46,9 +50,9 @@ public class TaskController {
     }
 
     @PatchMapping("/{id}")
-    public ChangeTaskStatusResponse changeStatus(@PathVariable UUID id, @RequestBody UpdateStatusRequest request) {
-        Task task = taskService.changeStatus(id, request.getStatus());
-        return new ChangeTaskStatusResponse(task.getId(), task.getStatus());
+    public ChangeTaskColumnResponse changeColumn(@PathVariable UUID id, @RequestBody UpdateTaskColumnRequest request) {
+        Task task = taskService.changeColumn(id, request.getColumnId());
+        return new ChangeTaskColumnResponse(task.getId(), task.getColumn().getId());
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

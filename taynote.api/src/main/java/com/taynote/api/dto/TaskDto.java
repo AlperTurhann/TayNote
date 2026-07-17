@@ -2,20 +2,18 @@ package com.taynote.api.dto;
 
 import java.util.UUID;
 
-import com.taynote.api.entity.Status;
-
 public class TaskDto {
 
     private UUID id;
     private String title;
     private String color;
-    private Status status;
+    private UUID columnId;
 
-    public TaskDto(UUID id, String title, String color, Status status) {
+    public TaskDto(UUID id, String title, String color, UUID columnId) {
         this.id = id;
         this.title = title;
         this.color = color;
-        this.status = status;
+        this.columnId = columnId;
     }
 
     public UUID getId() {
@@ -30,7 +28,7 @@ public class TaskDto {
         return color;
     }
 
-    public Status getStatus() {
-        return status;
+    public UUID getColumnId() {
+        return columnId;
     }
 }

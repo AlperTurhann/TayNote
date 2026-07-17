@@ -1,12 +1,12 @@
 package com.taynote.api.dto;
 
-import com.taynote.api.entity.Status;
+import java.util.UUID;
 
 public class CreateTaskRequest {
 
     private String title;
     private String color;
-    private Status status;
+    private UUID columnId;
 
     public String getTitle() {
         return title;
@@ -24,11 +24,11 @@ public class CreateTaskRequest {
         this.color = color;
     }
 
-    public Status getStatus() {
-        return status;
+    public UUID getColumnId() {
+        return columnId;
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
+    public void setColumnId(UUID columnId) {
+        this.columnId = columnId;
     }
 }

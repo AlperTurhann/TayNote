@@ -1,11 +1,22 @@
 package com.taynote.api.dto;
 
+import java.util.UUID;
+
 public class TableOperationsRequest {
 
     private String sorting;
     private int pageIndex;
     private int pageSize;
     private String query;
+    private UUID columnId;
+
+    public UUID getColumnId() {
+        return columnId;
+    }
+
+    public void setColumnId(UUID columnId) {
+        this.columnId = columnId;
+    }
 
     public String getSorting() {
         return sorting;

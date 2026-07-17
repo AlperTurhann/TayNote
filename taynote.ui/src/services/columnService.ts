@@ -1,0 +1,52 @@
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
+
+import { Column, CreateColumn, UpdateColumn } from '@/models/Column';
+import { tryCatch, TryCatchResult } from '@/utils/tryCatch';
+
+const getColumnsAsync = createAsyncThunk(
+  'columns/getColumnsAsync',
+  async (): Promise<TryCatchResult<Column[]>> => {
+    return await tryCatch<Column[]>(
+      axios
+        .get<Column[]>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/columns`)
+        .then((res) => res.data),
+      []
+    );
+  }
+);
+
+const addColumnAsync = createAsyncThunk(
+  'columns/addColumnAsync',
+  async (data: CreateColumn): Promise<TryCatchResult<Column>> => {
+    return await tryCatch<Column>(
+      axios
+        .post<Column>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/columns`, data)
+        .then((res) => res.data)
+    );
+  }
+);
+
+const updateColumnAsync = createAsyncThunk(
+  'columns/updateColumnAsync',
+  async ({ id, ...data }: UpdateColumn): Promise<TryCatchResult<Column>> => {
+    return await tryCatch<Column>(
+      axios
+        .patch<Column>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/columns/${id}`, data)
+        .then((res) => res.data)
+    );
+  }
+);
+
+const deleteColumnAsync = createAsyncThunk(
+  'columns/deleteColumnAsync',
+  async (columnId: string): Promise<TryCatchResult<string>> => {
+    return await tryCatch<string>(
+      axios
+        .delete<string>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/columns/${columnId}`)
+        .then((res) => res.data)
+    );
+  }
+);
+
+export { getColumnsAsync, addColumnAsync, updateColumnAsync, deleteColumnAsync };

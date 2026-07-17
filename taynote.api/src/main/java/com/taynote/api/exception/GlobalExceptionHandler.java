@@ -18,4 +18,20 @@ public class GlobalExceptionHandler {
                 "message", ex.getMessage(),
                 "timestamp", Instant.now().toString()));
     }
+
+    @ExceptionHandler(ColumnNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleColumnNotFound(ColumnNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                "status", HttpStatus.NOT_FOUND.value(),
+                "message", ex.getMessage(),
+                "timestamp", Instant.now().toString()));
+    }
+
+    @ExceptionHandler(ColumnNotEmptyException.class)
+    public ResponseEntity<Map<String, Object>> handleColumnNotEmpty(ColumnNotEmptyException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
+                "status", HttpStatus.CONFLICT.value(),
+                "message", ex.getMessage(),
+                "timestamp", Instant.now().toString()));
+    }
 }

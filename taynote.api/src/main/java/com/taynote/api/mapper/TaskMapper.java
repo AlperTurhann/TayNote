@@ -9,6 +9,6 @@ public final class TaskMapper {
     }
 
     public static TaskDto toDto(Task task) {
-        return new TaskDto(task.getId(), task.getTitle(), task.getColor(), task.getStatus());
+        return new TaskDto(task.getId(), task.getTitle(), task.getColor(), task.getColumn().getId());
     }
 }

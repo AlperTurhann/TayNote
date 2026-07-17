@@ -2,6 +2,7 @@
 import { ReactNode, useRef } from 'react';
 import { Provider } from 'react-redux';
 
+import AlertProvider from '@/components/providers/AlertProvider';
 import { makeStore } from '@/lib/store';
 
 interface Props {
@@ -13,7 +14,11 @@ const Providers = ({ children }: Props) => {
 
   storeRef.current ??= makeStore();
 
-  return <Provider store={storeRef.current}>{children}</Provider>;
+  return (
+    <AlertProvider>
+      <Provider store={storeRef.current}>{children}</Provider>
+    </AlertProvider>
+  );
 };
 
 export { Providers };
