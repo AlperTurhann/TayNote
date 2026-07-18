@@ -4,7 +4,8 @@ import { Plus } from 'lucide-react';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import Input from '@/components/Input';
+import { Button } from '@/components/base/Button';
+import Input from '@/components/base/Input';
 import { useAppDispatch } from '@/lib/hooks';
 import { ColumnFormData, ColumnFormSchema } from '@/schemas/ColumnSchema';
 import { addColumnAsync } from '@/services/columnService';
@@ -27,12 +28,12 @@ const NewColumnForm = () => {
 
   if (!isEditing) {
     return (
-      <button
+      <Button
+        className="h-fit rounded border-2 border-dashed -mt-0.5"
         onClick={() => setIsEditing(true)}
-        className="h-fit inline-flex whitespace-nowrap font-bold rounded border-2 border-dashed -mt-0.5 p-2 gap-x-1 bg-indigo-950 text-base-100"
       >
         <Plus /> New Column
-      </button>
+      </Button>
     );
   }
 
@@ -50,17 +51,13 @@ const NewColumnForm = () => {
         placeholder="Column Name"
         autoFocus
       />
-      <div className="flex gap-x-2">
-        <button type="submit" className="flex-1 rounded bg-indigo-700 p-1 text-base-100">
+      <div className="grid grid-cols-2 gap-x-2">
+        <Button colorVariant="green" type="submit" className="rounded">
           Add
-        </button>
-        <button
-          type="button"
-          onClick={() => setIsEditing(false)}
-          className="flex-1 rounded bg-base-700 p-1 text-base-100"
-        >
+        </Button>
+        <Button colorVariant="base" className="rounded" onClick={() => setIsEditing(false)}>
           Cancel
-        </button>
+        </Button>
       </div>
     </form>
   );

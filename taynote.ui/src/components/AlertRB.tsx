@@ -2,6 +2,7 @@
 import { AlertCircle, X } from 'lucide-react';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
+import { Button } from '@/components/base/Button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ALERT_AUTO_CLOSE, ALERT_AUTO_CLOSE_FAILURE } from '@/constants/alertConstants';
 import { AlertInfo, useAlertContext } from '@/context/AlertContext';
@@ -68,9 +69,13 @@ const AlertItem = ({ alertInfo, bottom, hideAlert, onHeightChange }: AlertItemPr
       <AlertCircle className="size-4" />
       <AlertTitle>{alertInfo.title}</AlertTitle>
       <AlertDescription className="text-xs lg:text-sm">{alertInfo.description}</AlertDescription>
-      <button className="absolute top-1 right-1 h-6 w-6" onClick={() => hideAlert(alertInfo.id)}>
-        <X className="size-4 m-auto" />
-      </button>
+      <Button
+        colorVariant="ghost"
+        className="absolute top-1 right-1 rounded-full p-1 text-destructive"
+        onClick={() => hideAlert(alertInfo.id)}
+      >
+        <X className="size-4" />
+      </Button>
     </Alert>
   );
 };

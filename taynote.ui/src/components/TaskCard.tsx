@@ -4,7 +4,8 @@ import { Pencil, X } from 'lucide-react';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 
-import Input from '@/components/Input';
+import { Button } from '@/components/base/Button';
+import Input from '@/components/base/Input';
 import { useAppDispatch } from '@/lib/hooks';
 import { Task } from '@/models/Task';
 import { TaskFormData, TaskFormSchema } from '@/schemas/TaskSchema';
@@ -21,7 +22,7 @@ interface TaskCardProps {
 
 const SkeletonTaskCard = () => {
   return (
-    <div className="w-full h-24 flex items-center justify-center animate-pulse bg-base-700/10">
+    <div className="w-full h-56 flex items-center justify-center animate-pulse bg-base-700/10">
       <p className="text-base-300/50">New Task</p>
     </div>
   );
@@ -70,17 +71,13 @@ const NewTaskCard = ({ columnId, onCancel }: NewTaskCardProps) => {
         required
         className="w-full"
       />
-      <div className="flex gap-x-2">
-        <button type="submit" className="flex-1 rounded bg-indigo-700 p-1 text-base-100">
+      <div className="grid grid-cols-2 gap-x-2">
+        <Button colorVariant="green" type="submit" className="rounded">
           Add
-        </button>
-        <button
-          type="button"
-          onClick={onCancel}
-          className="flex-1 rounded bg-base-600 p-1 text-base-100"
-        >
+        </Button>
+        <Button colorVariant="base" className="rounded" onClick={onCancel}>
           Cancel
-        </button>
+        </Button>
       </div>
     </form>
   );
@@ -90,7 +87,7 @@ const TaskCard = ({ task }: TaskCardProps) => {
   const dispatch = useAppDispatch();
 
   const onDeleteTask = async () => {
-    await dispatch(deleteTaskAsync(task.id));
+    await dispatch(deleteTaskAsync({ taskId: task.id, columnId: task.columnId }));
   };
 
   return (

@@ -30,9 +30,9 @@ public class TaskService {
 
     public Page<Task> search(TableOperationsRequest request) {
         Sort sort = switch (request.getSorting()) {
-            case "ascending" -> Sort.by(Sort.Direction.ASC, "title");
-            case "descending" -> Sort.by(Sort.Direction.DESC, "title");
-            default -> Sort.by(Sort.Direction.ASC, "createdAt");
+            case "ascending" -> Sort.by(new Sort.Order(Sort.Direction.ASC, "title").ignoreCase());
+            case "descending" -> Sort.by(new Sort.Order(Sort.Direction.DESC, "title").ignoreCase());
+            default -> Sort.by(Sort.Direction.DESC, "createdAt");
         };
         int pageIndex = Math.max(request.getPageIndex() - 1, 0);
         Pageable pageable = PageRequest.of(pageIndex, request.getPageSize(), sort);

@@ -15,4 +15,4 @@ const PageTemplate = ({ children, className }: Props) => {
   );
 };
 
-export default PageTemplate;
+export { PageTemplate };

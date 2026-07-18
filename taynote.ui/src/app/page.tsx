@@ -1,6 +1,6 @@
+import { PageTemplate } from '@/components/base/PageTemplate';
 import { Board } from '@/components/Board';
-import PageTemplate from '@/components/PageTemplate';
-import TaskSearchBar from '@/components/TaskSearchBar';
+import { TaskSearchBar } from '@/components/SearchBar';
 
 const Home = () => {
   return (

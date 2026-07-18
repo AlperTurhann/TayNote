@@ -18,7 +18,7 @@ const Board = () => {
 
   return (
     <ScrollArea>
-      <div className="size-full flex p-2 gap-x-4">
+      <div className="size-full flex p-2 pb-4 gap-x-4">
         {columns.map((column) => (
           <Column key={column.id} column={column} />
         ))}
