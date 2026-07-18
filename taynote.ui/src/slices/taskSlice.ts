@@ -4,8 +4,8 @@ import { EMPTY_COLUMN_TASKS_STATE } from '@/constants/generalConstants';
 import { ColumnTasksState, TaskState } from '@/models/Task';
 import {
   addTaskAsync,
-  changeTaskColumnAsync,
-  changeTaskCompletedAsync,
+  updateTaskAsync,
+  updateTaskColumnAsync,
   deleteTaskAsync,
   getTasksAsync,
   resetAllFiltersAsync,
@@ -80,22 +80,22 @@ const taskSlice = createSlice({
         state.addTask.error = action.payload.error ?? undefined;
       });
     //#endregion
-    //#region Change Task Column
+    //#region Update Task
     builder
-      .addCase(changeTaskColumnAsync.pending, (state) => {
+      .addCase(updateTaskAsync.pending, (state) => {
         state.updateTask.isLoading = true;
       })
-      .addCase(changeTaskColumnAsync.fulfilled, (state, action) => {
+      .addCase(updateTaskAsync.fulfilled, (state, action) => {
         state.updateTask.isLoading = false;
         state.updateTask.error = action.payload.error ?? undefined;
       });
     //#endregion
-    //#region Change Task Column
+    //#region Update Task Column
     builder
-      .addCase(changeTaskCompletedAsync.pending, (state) => {
+      .addCase(updateTaskColumnAsync.pending, (state) => {
         state.updateTask.isLoading = true;
       })
-      .addCase(changeTaskCompletedAsync.fulfilled, (state, action) => {
+      .addCase(updateTaskColumnAsync.fulfilled, (state, action) => {
         state.updateTask.isLoading = false;
         state.updateTask.error = action.payload.error ?? undefined;
       });

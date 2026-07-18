@@ -4,7 +4,7 @@ import { Board } from '@/models/Board';
 import { FetchOperations } from '@/models/FetchOperations';
 import {
   addBoardAsync,
-  changeBoardAsync,
+  updateBoardAsync,
   deleteBoardAsync,
   getBoardsAsync
 } from '@/services/boardService';
@@ -59,12 +59,12 @@ const boardSlice = createSlice({
         state.addBoard.error = action.payload.error ?? undefined;
       });
     //#endregion
-    //#region Change Board
+    //#region Update Board
     builder
-      .addCase(changeBoardAsync.pending, (state) => {
+      .addCase(updateBoardAsync.pending, (state) => {
         state.updateBoard.isLoading = true;
       })
-      .addCase(changeBoardAsync.fulfilled, (state, action) => {
+      .addCase(updateBoardAsync.fulfilled, (state, action) => {
         state.updateBoard.isLoading = false;
         state.updateBoard.error = action.payload.error ?? undefined;
       });

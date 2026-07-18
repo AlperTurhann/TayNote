@@ -1,6 +1,6 @@
 'use client';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowUpRight, Check, Pencil, Trash2 } from 'lucide-react';
+import { ArrowUpRight, Check, Pencil, Trash2, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -12,7 +12,7 @@ import { VerificationRequiredButton } from '@/components/VerificationRequiredBut
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { Board } from '@/models/Board';
 import { BoardFormData, BoardFormSchema } from '@/schemas/BoardSchema';
-import { changeBoardAsync, deleteBoardAsync, getBoardsAsync } from '@/services/boardService';
+import { updateBoardAsync, deleteBoardAsync, getBoardsAsync } from '@/services/boardService';
 import { selectBoards } from '@/slices/boardSlice';
 
 interface BoardButtonProps {
@@ -41,7 +41,7 @@ const BoardLink = ({ board }: BoardButtonProps) => {
   const confirmEditing = handleSubmit(async ({ name }) => {
     const trimmed = name.trim();
     if (trimmed && trimmed !== board.name) {
-      await dispatch(changeBoardAsync({ id: board.id, name: trimmed }));
+      await dispatch(updateBoardAsync({ id: board.id, name: trimmed }));
     }
     setIsEditingName(false);
   });
@@ -76,6 +76,13 @@ const BoardLink = ({ board }: BoardButtonProps) => {
             onClick={confirmEditing}
           >
             <Check />
+          </Button>
+          <Button
+            colorVariant="red"
+            onPointerDown={(e) => e.preventDefault()}
+            onClick={cancelEditing}
+          >
+            <X />
           </Button>
         </>
       ) : (

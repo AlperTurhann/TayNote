@@ -12,10 +12,11 @@ import org.springframework.stereotype.Service;
 import com.taynote.api.dto.board.request.BoardOperationsRequest;
 import com.taynote.api.dto.task.TaskDto;
 import com.taynote.api.dto.task.request.CreateTaskRequest;
-import com.taynote.api.dto.task.response.ChangeTaskColumnResponse;
-import com.taynote.api.dto.task.response.ChangeTaskCompletedResponse;
+import com.taynote.api.dto.task.request.UpdateTaskRequest;
+import com.taynote.api.dto.task.response.UpdateTaskColumnResponse;
 import com.taynote.api.dto.task.response.CreateTaskResponse;
 import com.taynote.api.dto.task.response.TaskSearchResponse;
+import com.taynote.api.dto.task.response.UpdateTaskResponse;
 import com.taynote.api.entity.BoardColumn;
 import com.taynote.api.entity.Task;
 import com.taynote.api.exception.column.ColumnNotFoundException;
@@ -66,16 +67,24 @@ public class TaskService {
         return TaskMapper.toCreateResponse(taskRepository.save(task));
     }
 
-    public ChangeTaskColumnResponse changeColumn(UUID id, UUID columnId) {
+    public UpdateTaskResponse update(UUID id, UpdateTaskRequest request) {
         Task task = taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
-        task.setColumn(findColumn(columnId));
-        return TaskMapper.toChangeColumnResponse(taskRepository.save(task));
+        if (request.getTitle() != null) {
+            task.setTitle(request.getTitle());
+        }
+        if (request.getColor() != null) {
+            task.setColor(request.getColor());
+        }
+        if (request.getCompleted() != null) {
+            task.setCompleted(request.getCompleted());
+        }
+        return TaskMapper.toUpdateResponse(taskRepository.save(task));
     }
 
-    public ChangeTaskCompletedResponse changeCompleted(UUID id, boolean completed) {
+    public UpdateTaskColumnResponse updateColumn(UUID id, UUID columnId) {
         Task task = taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
-        task.setCompleted(completed);
-        return TaskMapper.toChangeCompletedResponse(taskRepository.save(task));
+        task.setColumn(findColumn(columnId));
+        return TaskMapper.toUpdateColumnResponse(taskRepository.save(task));
     }
 
     private BoardColumn findColumn(UUID columnId) {

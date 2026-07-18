@@ -2,12 +2,12 @@ package com.taynote.api.dto.task.response;
 
 import java.util.UUID;
 
-public class ChangeTaskColumnResponse {
+public class UpdateTaskColumnResponse {
 
     private UUID id;
     private UUID columnId;
 
-    public ChangeTaskColumnResponse(UUID id, UUID columnId) {
+    public UpdateTaskColumnResponse(UUID id, UUID columnId) {
         this.id = id;
         this.columnId = columnId;
     }

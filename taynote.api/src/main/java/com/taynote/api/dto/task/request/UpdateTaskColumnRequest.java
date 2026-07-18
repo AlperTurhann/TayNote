@@ -2,7 +2,7 @@ package com.taynote.api.dto.task.request;
 
 import java.util.UUID;
 
-public class ChangeTaskColumnRequest {
+public class UpdateTaskColumnRequest {
 
     private UUID columnId;
 

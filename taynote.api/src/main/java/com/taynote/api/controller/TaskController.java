@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.taynote.api.dto.board.request.BoardOperationsRequest;
 import com.taynote.api.dto.task.request.CreateTaskRequest;
-import com.taynote.api.dto.task.request.ChangeTaskColumnRequest;
-import com.taynote.api.dto.task.request.ChangeTaskCompletedRequest;
-import com.taynote.api.dto.task.response.ChangeTaskColumnResponse;
-import com.taynote.api.dto.task.response.ChangeTaskCompletedResponse;
+import com.taynote.api.dto.task.request.UpdateTaskRequest;
+import com.taynote.api.dto.task.request.UpdateTaskColumnRequest;
+import com.taynote.api.dto.task.response.UpdateTaskColumnResponse;
 import com.taynote.api.dto.task.response.CreateTaskResponse;
 import com.taynote.api.dto.task.response.TaskSearchResponse;
+import com.taynote.api.dto.task.response.UpdateTaskResponse;
 import com.taynote.api.service.TaskService;
 
 @RestController
@@ -44,14 +44,14 @@ public class TaskController {
     }
 
     @PatchMapping("/{id}")
-    public ChangeTaskColumnResponse changeColumn(@PathVariable UUID id, @RequestBody ChangeTaskColumnRequest request) {
-        return taskService.changeColumn(id, request.getColumnId());
+    public UpdateTaskResponse changeCompleted(@PathVariable UUID id,
+            @RequestBody UpdateTaskRequest request) {
+        return taskService.update(id, request);
     }
 
-    @PatchMapping("/{id}/change-complete")
-    public ChangeTaskCompletedResponse changeCompleted(@PathVariable UUID id,
-            @RequestBody ChangeTaskCompletedRequest request) {
-        return taskService.changeCompleted(id, request.getCompleted());
+    @PatchMapping("/{id}/update-column")
+    public UpdateTaskColumnResponse updateColumn(@PathVariable UUID id, @RequestBody UpdateTaskColumnRequest request) {
+        return taskService.updateColumn(id, request.getColumnId());
     }
 
     @DeleteMapping(value = "/{id}")

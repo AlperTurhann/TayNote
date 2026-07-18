@@ -31,8 +31,8 @@ const addBoardAsync = createAsyncThunk<TryCatchResult<Board>, CreateBoard, Thunk
   }
 );
 
-const changeBoardAsync = createAsyncThunk<TryCatchResult<Board>, Board, ThunkConfig>(
-  'boards/changeBoardAsync',
+const updateBoardAsync = createAsyncThunk<TryCatchResult<Board>, Board, ThunkConfig>(
+  'boards/updateBoardAsync',
   async ({ id, name }, { dispatch }) => {
     const result = await tryCatch<Board>(
       axios
@@ -63,4 +63,4 @@ const deleteBoardAsync = createAsyncThunk<TryCatchResult<void>, string, ThunkCon
   }
 );
 
-export { getBoardsAsync, addBoardAsync, changeBoardAsync, deleteBoardAsync };
+export { getBoardsAsync, addBoardAsync, updateBoardAsync, deleteBoardAsync };

@@ -12,22 +12,15 @@ interface Task extends CreateTask {
   completed: boolean;
 }
 
-interface ChangeTaskColumn {
+interface UpdateTask extends Partial<Task> {
   id: string;
   columnId: string;
 }
 
-interface ChangeTaskCompleted {
+interface MoveTask {
   id: string;
-  completed: boolean;
-}
-
-interface MoveTask extends ChangeTaskColumn {
+  columnId: string;
   sourceColumnId: string;
-}
-
-interface CompleteTask extends ChangeTaskCompleted {
-  columnId: string;
 }
 
 interface DeleteTask {
@@ -59,10 +52,8 @@ interface TaskState {
 export type {
   CreateTask,
   Task,
-  ChangeTaskColumn,
-  ChangeTaskCompleted,
+  UpdateTask,
   MoveTask,
-  CompleteTask,
   DeleteTask,
   TaskSearchResult,
   ColumnTasksState,
