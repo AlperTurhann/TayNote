@@ -8,6 +8,7 @@ import { Button } from '@/components/base/Button';
 import Input from '@/components/base/Input';
 import { LinkButton } from '@/components/base/LinkButton';
 import { NewBoardForm } from '@/components/NewBoardForm';
+import { VerificationRequiredButton } from '@/components/VerificationRequiredButton';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { Board } from '@/models/Board';
 import { BoardFormData, BoardFormSchema } from '@/schemas/BoardSchema';
@@ -89,9 +90,15 @@ const BoardLink = ({ board }: BoardButtonProps) => {
           <Button colorVariant="white" onClick={() => setIsEditingName(true)}>
             <Pencil />
           </Button>
-          <Button colorVariant="red" onClick={onDeleteBoard}>
-            <Trash2 />
-          </Button>
+          <VerificationRequiredButton
+            button={
+              <Button colorVariant="red">
+                <Trash2 />
+              </Button>
+            }
+            description="This action cannot be undone. This will permanently delete your board."
+            handleAccept={onDeleteBoard}
+          />
         </>
       )}
     </div>

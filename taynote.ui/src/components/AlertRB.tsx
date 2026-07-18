@@ -6,7 +6,6 @@ import { Button } from '@/components/base/Button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ALERT_AUTO_CLOSE, ALERT_AUTO_CLOSE_FAILURE } from '@/constants/alertConstants';
 import { AlertInfo, useAlertContext } from '@/context/AlertContext';
-import { cn } from '@/lib/utils';
 
 const ALERT_GAP = 12;
 
@@ -59,9 +58,7 @@ const AlertItem = ({ alertInfo, bottom, hideAlert, onHeightChange }: AlertItemPr
     <Alert
       ref={elementRef}
       variant={`${alertInfo.type === 'failure' ? 'destructive' : 'default'}`}
-      className={cn(
-        'fixed right-3 z-50 w-[95%] transition-[bottom,color] duration-300 bg-base-100 hover:brightness-125 sm:w-1/2 md:w-1/3 lg:w-1/4'
-      )}
+      className="fixed right-3 z-50 w-[95%] transition-[bottom,color] duration-300 bg-base-100 hover:brightness-125 sm:w-1/2 md:w-1/3 lg:w-1/4"
       style={{ bottom: `${bottom}px` }}
       onMouseEnter={stopTimer}
       onMouseLeave={startTimer}

@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 
 import { Button } from '@/components/base/Button';
 import Input from '@/components/base/Input';
+import { VerificationRequiredButton } from '@/components/VerificationRequiredButton';
 import { useAppDispatch } from '@/lib/hooks';
 import { cn } from '@/lib/utils';
 import { Task } from '@/models/Task';
@@ -110,14 +111,20 @@ const TaskCard = ({ task }: TaskCardProps) => {
         <div className="h-fit flex items-center">
           <Button
             colorVariant="ghost"
-            className="rounded-full disabled:text-gray-500/50 disabled:pointer-events-none"
+            className="rounded-full disabled:text-gray-500/50 disabled:pointer-events-none p-1"
             disabled
           >
             <Pencil size={14} />
           </Button>
-          <Button colorVariant="ghost" className="rounded-full" onClick={onDeleteTask}>
-            <X size={16} />
-          </Button>
+          <VerificationRequiredButton
+            button={
+              <Button colorVariant="ghost" className="rounded-full p-1">
+                <X size={16} />
+              </Button>
+            }
+            description="This action cannot be undone. This will permanently delete your task."
+            handleAccept={onDeleteTask}
+          />
         </div>
       </div>
       <div className="flex justify-end">

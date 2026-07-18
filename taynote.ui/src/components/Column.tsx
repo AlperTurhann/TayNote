@@ -10,6 +10,7 @@ import Input from './base/Input';
 import { ColumnSearchBar } from '@/components/SearchBar';
 import { NewTaskCard, SkeletonTaskCard, TaskCard } from '@/components/TaskCard';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { VerificationRequiredButton } from '@/components/VerificationRequiredButton';
 import { NEXT_SORTING, SORT_ICONS } from '@/constants/boardConstants';
 import { DEFAULT_TABLE_OPERATIONS } from '@/constants/generalConstants';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
@@ -144,9 +145,15 @@ const ColumnHeader = ({ column, setAddTaskIsHovered, onAddTaskClick }: ColumnHea
             >
               <Plus />
             </Button>
-            <Button colorVariant="red" className="border border-b-0" onClick={onDeleteColumn}>
-              <Trash2 />
-            </Button>
+            <VerificationRequiredButton
+              button={
+                <Button colorVariant="red" className="border border-b-0">
+                  <Trash2 />
+                </Button>
+              }
+              description="This action cannot be undone. This will permanently delete your column."
+              handleAccept={onDeleteColumn}
+            />
           </>
         )}
       </div>
