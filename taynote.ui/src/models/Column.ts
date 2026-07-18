@@ -1,5 +1,6 @@
 interface CreateColumn {
   name: string;
+  boardId: string;
 }
 
 interface Column extends CreateColumn {

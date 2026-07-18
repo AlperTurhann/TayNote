@@ -1,6 +1,6 @@
-package com.taynote.api.dto;
+package com.taynote.api.dto.column.request;
 
-public class CreateColumnRequest {
+public class UpdateColumnRequest {
 
     private String name;
     private Integer orderNo;

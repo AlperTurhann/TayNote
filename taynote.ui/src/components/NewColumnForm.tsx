@@ -10,7 +10,11 @@ import { useAppDispatch } from '@/lib/hooks';
 import { ColumnFormData, ColumnFormSchema } from '@/schemas/ColumnSchema';
 import { addColumnAsync } from '@/services/columnService';
 
-const NewColumnForm = () => {
+interface NewColumnFormProps {
+  boardId: string;
+}
+
+const NewColumnForm = ({ boardId }: NewColumnFormProps) => {
   const dispatch = useAppDispatch();
   const [isEditing, setIsEditing] = useState(false);
   const {
@@ -21,7 +25,7 @@ const NewColumnForm = () => {
   } = useForm<ColumnFormData>({ resolver: zodResolver(ColumnFormSchema) });
 
   const onSubmit = async (data: ColumnFormData) => {
-    await dispatch(addColumnAsync(data));
+    await dispatch(addColumnAsync({ ...data, boardId }));
     reset();
     setIsEditing(false);
   };

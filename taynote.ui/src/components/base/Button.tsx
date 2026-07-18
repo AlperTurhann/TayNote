@@ -9,12 +9,13 @@ const buttonVariants = cva(
     variants: {
       color: {
         default: 'bg-indigo-950 hover:bg-indigo-800',
-        secondary: 'bg-base-700',
+        secondary: 'bg-base-700 hover:bg-base-600',
         green: 'bg-green-900 hover:bg-green-800',
         red: 'bg-red-950 hover:bg-red-900',
         white: 'bg-white/10 hover:bg-white/20',
         base: 'bg-base-600 hover:bg-base-500',
-        ghost: 'hover:bg-gray-900/20'
+        ghost: 'hover:bg-white/20',
+        darkGhost: 'hover:bg-gray-900/20'
       }
     },
     defaultVariants: {

@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 
+import { Header } from '@/components/layout/Header';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -9,8 +10,9 @@ interface Props {
 
 const PageTemplate = ({ children, className }: Props) => {
   return (
-    <div className={cn('h-screen flex flex-col overflow-hidden p-4 gap-y-4', className)}>
-      {children}
+    <div className="h-screen flex flex-col overflow-hidden">
+      <Header />
+      <div className={cn('flex flex-col flex-1 p-4 gap-y-4', className)}>{children}</div>
     </div>
   );
 };

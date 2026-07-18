@@ -1,21 +1,21 @@
-package com.taynote.api.dto;
+package com.taynote.api.dto.task.response;
 
 import java.util.UUID;
 
-public class TaskDto {
+public class CreateTaskResponse {
 
     private UUID id;
     private String title;
     private String color;
-    private UUID columnId;
     private boolean completed;
+    private UUID columnId;
 
-    public TaskDto(UUID id, String title, String color, UUID columnId, boolean completed) {
+    public CreateTaskResponse(UUID id, String title, String color, boolean completed, UUID columnId) {
         this.id = id;
         this.title = title;
         this.color = color;
-        this.columnId = columnId;
         this.completed = completed;
+        this.columnId = columnId;
     }
 
     public UUID getId() {
@@ -30,11 +30,11 @@ public class TaskDto {
         return color;
     }
 
-    public UUID getColumnId() {
-        return columnId;
-    }
-
     public boolean getCompleted() {
         return completed;
+    }
+
+    public UUID getColumnId() {
+        return columnId;
     }
 }

@@ -1,4 +1,4 @@
-package com.taynote.api.exception;
+package com.taynote.api.exception.column;
 
 import java.util.UUID;
 

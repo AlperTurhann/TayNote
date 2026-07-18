@@ -84,7 +84,6 @@ const columnSlice = createSlice({
         state.deleteColumn.isLoading = true;
       })
       .addCase(deleteColumnAsync.fulfilled, (state, action) => {
-        state.columns = state.columns.filter((column) => column.id !== action.payload.data);
         state.deleteColumn.isLoading = false;
         state.deleteColumn.error = action.payload.error ?? undefined;
       });

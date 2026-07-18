@@ -8,6 +8,7 @@ import {
   changeTaskCompletedAsync,
   deleteTaskAsync,
   getTasksAsync,
+  resetAllFiltersAsync,
   searchAllColumnsAsync
 } from '@/services/taskService';
 
@@ -62,6 +63,11 @@ const taskSlice = createSlice({
     //#region Search All Columns
     builder.addCase(searchAllColumnsAsync.pending, (state, action) => {
       state.globalQuery = action.meta.arg;
+    });
+    //#endregion
+    //#region Reset All Filters
+    builder.addCase(resetAllFiltersAsync.pending, (state) => {
+      state.globalQuery = '';
     });
     //#endregion
     //#region Add Task

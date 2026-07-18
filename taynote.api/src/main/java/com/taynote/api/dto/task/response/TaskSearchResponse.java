@@ -1,6 +1,8 @@
-package com.taynote.api.dto;
+package com.taynote.api.dto.task.response;
 
 import java.util.List;
+
+import com.taynote.api.dto.task.TaskDto;
 
 public class TaskSearchResponse {
 

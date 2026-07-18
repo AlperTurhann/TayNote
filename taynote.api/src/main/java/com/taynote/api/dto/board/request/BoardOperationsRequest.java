@@ -1,8 +1,8 @@
-package com.taynote.api.dto;
+package com.taynote.api.dto.board.request;
 
 import java.util.UUID;
 
-public class TableOperationsRequest {
+public class BoardOperationsRequest {
 
     private String sorting;
     private int pageIndex;

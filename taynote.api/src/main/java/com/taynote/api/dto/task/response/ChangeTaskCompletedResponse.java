@@ -1,4 +1,4 @@
-package com.taynote.api.dto;
+package com.taynote.api.dto.task.response;
 
 import java.util.UUID;
 

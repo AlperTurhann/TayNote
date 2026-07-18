@@ -1,13 +1,12 @@
 import { PageTemplate } from '@/components/base/PageTemplate';
-import { Board } from '@/components/Board';
-import { TaskSearchBar } from '@/components/SearchBar';
+import { BoardList } from '@/components/BoardList';
 
 const Home = () => {
   return (
     <PageTemplate>
-      <h1 className="text-center font-bold text-3xl text-base-100">TayNote</h1>
-      <TaskSearchBar />
-      <Board />
+      <div className="flex flex-1 items-center justify-center text-base-400">
+        <BoardList />
+      </div>
     </PageTemplate>
   );
 };

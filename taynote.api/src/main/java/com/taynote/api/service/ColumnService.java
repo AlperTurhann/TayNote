@@ -5,11 +5,17 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import com.taynote.api.dto.CreateColumnRequest;
-import com.taynote.api.dto.UpdateColumnRequest;
+import com.taynote.api.dto.column.request.CreateColumnRequest;
+import com.taynote.api.dto.column.request.UpdateColumnRequest;
+import com.taynote.api.dto.column.response.CreateColumnResponse;
+import com.taynote.api.dto.column.response.UpdateColumnResponse;
+import com.taynote.api.entity.Board;
 import com.taynote.api.entity.BoardColumn;
-import com.taynote.api.exception.ColumnNotEmptyException;
-import com.taynote.api.exception.ColumnNotFoundException;
+import com.taynote.api.exception.board.BoardNotFoundException;
+import com.taynote.api.exception.column.ColumnNotEmptyException;
+import com.taynote.api.exception.column.ColumnNotFoundException;
+import com.taynote.api.mapper.ColumnMapper;
+import com.taynote.api.repository.BoardRepository;
 import com.taynote.api.repository.ColumnRepository;
 import com.taynote.api.repository.TaskRepository;
 
@@ -18,24 +24,29 @@ public class ColumnService {
 
     private final ColumnRepository columnRepository;
     private final TaskRepository taskRepository;
+    private final BoardRepository boardRepository;
 
-    public ColumnService(ColumnRepository columnRepository, TaskRepository taskRepository) {
+    public ColumnService(ColumnRepository columnRepository, TaskRepository taskRepository,
+            BoardRepository boardRepository) {
         this.columnRepository = columnRepository;
         this.taskRepository = taskRepository;
+        this.boardRepository = boardRepository;
     }
 
-    public List<BoardColumn> findAll() {
-        return columnRepository.findAllByOrderByOrderNoAsc();
+    public List<BoardColumn> findAll(UUID boardId) {
+        return columnRepository.findByBoard_IdOrderByOrderNoAsc(boardId);
     }
 
-    public BoardColumn create(CreateColumnRequest request) {
+    public CreateColumnResponse create(CreateColumnRequest request) {
+        Board board = findBoard(request.getBoardId());
         BoardColumn column = new BoardColumn();
         column.setName(request.getName());
-        column.setOrderNo(request.getOrderNo() != null ? request.getOrderNo() : nextOrderNo());
-        return columnRepository.save(column);
+        column.setOrderNo(nextOrderNo(board.getId()));
+        column.setBoard(board);
+        return ColumnMapper.toCreateResponse(columnRepository.save(column));
     }
 
-    public BoardColumn update(UUID id, UpdateColumnRequest request) {
+    public UpdateColumnResponse update(UUID id, UpdateColumnRequest request) {
         BoardColumn column = columnRepository.findById(id).orElseThrow(() -> new ColumnNotFoundException(id));
         if (request.getName() != null) {
             column.setName(request.getName());
@@ -43,21 +54,28 @@ public class ColumnService {
         if (request.getOrderNo() != null) {
             column.setOrderNo(request.getOrderNo());
         }
-        return columnRepository.save(column);
+        return ColumnMapper.toUpdateResponse(columnRepository.save(column));
     }
 
     public void delete(UUID id) {
-        BoardColumn column = columnRepository.findById(id).orElseThrow(() -> new ColumnNotFoundException(id));
+        if (!columnRepository.existsById((id))) {
+            throw new ColumnNotFoundException(id);
+        }
         if (taskRepository.existsByColumn_Id(id)) {
             throw new ColumnNotEmptyException(id);
         }
-        columnRepository.delete(column);
+
+        columnRepository.deleteById(id);
     }
 
-    private int nextOrderNo() {
-        return columnRepository.findAllByOrderByOrderNoAsc().stream()
+    private int nextOrderNo(UUID boardId) {
+        return columnRepository.findByBoard_IdOrderByOrderNoAsc(boardId).stream()
                 .mapToInt(BoardColumn::getOrderNo)
                 .max()
                 .orElse(-1) + 1;
+    }
+
+    private Board findBoard(UUID boardId) {
+        return boardRepository.findById(boardId).orElseThrow(() -> new BoardNotFoundException(boardId));
     }
 }

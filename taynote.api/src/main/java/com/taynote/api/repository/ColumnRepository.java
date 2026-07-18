@@ -7,7 +7,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.taynote.api.entity.BoardColumn;
 
+import jakarta.transaction.Transactional;
+
 public interface ColumnRepository extends JpaRepository<BoardColumn, UUID> {
 
-    List<BoardColumn> findAllByOrderByOrderNoAsc();
+    List<BoardColumn> findByBoard_IdOrderByOrderNoAsc(UUID boardId);
+
+    @Transactional
+    void deleteByBoard_Id(UUID boardId);
 }

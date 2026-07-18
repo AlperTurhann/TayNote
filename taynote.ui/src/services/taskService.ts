@@ -76,6 +76,18 @@ const searchAllColumnsAsync = createAsyncThunk<void, string, ThunkConfig>(
   }
 );
 
+const resetAllFiltersAsync = createAsyncThunk<void, void, ThunkConfig>(
+  'tasks/resetAllFiltersAsync',
+  async (_, { dispatch, getState }) => {
+    const { columns } = getState().column;
+    await Promise.all(
+      columns.map((column) =>
+        dispatch(getTasksAsync({ ...DEFAULT_TABLE_OPERATIONS, columnId: column.id }))
+      )
+    );
+  }
+);
+
 const addTaskAsync = createAsyncThunk<TryCatchResult<Task>, CreateTask, ThunkConfig>(
   'tasks/addTasksAsync',
   async (data, thunkAPI) => {
@@ -84,7 +96,7 @@ const addTaskAsync = createAsyncThunk<TryCatchResult<Task>, CreateTask, ThunkCon
         .post<Task>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/tasks`, data)
         .then((res) => res.data)
     );
-    if (result.data) {
+    if (!result.error) {
       refetchColumn(thunkAPI, data.columnId);
     }
     return result;
@@ -103,7 +115,7 @@ const changeTaskColumnAsync = createAsyncThunk<
       })
       .then((res) => res.data)
   );
-  if (result.data) {
+  if (!result.error) {
     refetchColumn(thunkAPI, sourceColumnId);
     refetchColumn(thunkAPI, columnId);
   }
@@ -125,21 +137,21 @@ const changeTaskCompletedAsync = createAsyncThunk<
       )
       .then((res) => res.data)
   );
-  if (result.data) {
+  if (!result.error) {
     refetchColumn(thunkAPI, columnId);
   }
   return result;
 });
 
-const deleteTaskAsync = createAsyncThunk<TryCatchResult<string>, DeleteTask, ThunkConfig>(
+const deleteTaskAsync = createAsyncThunk<TryCatchResult<void>, DeleteTask, ThunkConfig>(
   'tasks/deleteTaskAsync',
   async ({ taskId, columnId }, thunkAPI) => {
-    const result = await tryCatch<string>(
+    const result = await tryCatch<void>(
       axios
-        .delete<string>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/tasks/${taskId}`)
+        .delete<void>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/tasks/${taskId}`)
         .then((res) => res.data)
     );
-    if (result.data) {
+    if (!result.error) {
       refetchColumn(thunkAPI, columnId);
     }
     return result;
@@ -152,5 +164,6 @@ export {
   changeTaskColumnAsync,
   changeTaskCompletedAsync,
   deleteTaskAsync,
-  searchAllColumnsAsync
+  searchAllColumnsAsync,
+  resetAllFiltersAsync
 };

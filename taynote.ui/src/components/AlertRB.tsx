@@ -70,7 +70,7 @@ const AlertItem = ({ alertInfo, bottom, hideAlert, onHeightChange }: AlertItemPr
       <AlertTitle>{alertInfo.title}</AlertTitle>
       <AlertDescription className="text-xs lg:text-sm">{alertInfo.description}</AlertDescription>
       <Button
-        colorVariant="ghost"
+        colorVariant="darkGhost"
         className="absolute top-1 right-1 rounded-full p-1 text-destructive"
         onClick={() => hideAlert(alertInfo.id)}
       >

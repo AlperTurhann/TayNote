@@ -1,6 +1,6 @@
-package com.taynote.api.dto;
+package com.taynote.api.dto.task.request;
 
-public class UpdateTaskCompletedRequest {
+public class ChangeTaskCompletedRequest {
 
     private boolean completed;
 

@@ -26,15 +26,15 @@ public class Task {
     @Column(nullable = false)
     private String color;
 
-    @ManyToOne
-    @JoinColumn(name = "column_id", nullable = false)
-    private BoardColumn column;
-
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean completed = false;
 
     @Column(nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
+
+    @ManyToOne
+    @JoinColumn(name = "column_id", nullable = false)
+    private BoardColumn column;
 
     public UUID getId() {
         return id;
@@ -60,14 +60,6 @@ public class Task {
         this.color = color;
     }
 
-    public BoardColumn getColumn() {
-        return column;
-    }
-
-    public void setColumn(BoardColumn column) {
-        this.column = column;
-    }
-
     public boolean getCompleted() {
         return completed;
     }
@@ -82,5 +74,13 @@ public class Task {
 
     public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public BoardColumn getColumn() {
+        return column;
+    }
+
+    public void setColumn(BoardColumn column) {
+        this.column = column;
     }
 }

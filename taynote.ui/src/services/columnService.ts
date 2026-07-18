@@ -6,10 +6,10 @@ import { tryCatch, TryCatchResult } from '@/utils/tryCatch';
 
 const getColumnsAsync = createAsyncThunk(
   'columns/getColumnsAsync',
-  async (): Promise<TryCatchResult<Column[]>> => {
+  async (boardId: string): Promise<TryCatchResult<Column[]>> => {
     return await tryCatch<Column[]>(
       axios
-        .get<Column[]>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/columns`)
+        .get<Column[]>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/columns`, { params: { boardId } })
         .then((res) => res.data),
       []
     );
@@ -40,10 +40,10 @@ const updateColumnAsync = createAsyncThunk(
 
 const deleteColumnAsync = createAsyncThunk(
   'columns/deleteColumnAsync',
-  async (columnId: string): Promise<TryCatchResult<string>> => {
-    return await tryCatch<string>(
+  async (columnId: string): Promise<TryCatchResult<void>> => {
+    return await tryCatch<void>(
       axios
-        .delete<string>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/columns/${columnId}`)
+        .delete<void>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/columns/${columnId}`)
         .then((res) => res.data)
     );
   }

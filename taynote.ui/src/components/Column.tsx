@@ -1,6 +1,7 @@
 'use client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Check, Plus, Trash2, X } from 'lucide-react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -17,6 +18,7 @@ import { ColumnFormData, ColumnFormSchema } from '@/schemas/ColumnSchema';
 import { deleteColumnAsync, updateColumnAsync } from '@/services/columnService';
 import { getTasksAsync } from '@/services/taskService';
 import { selectColumnTasks } from '@/slices/taskSlice';
+import { parseFilters, parseGlobalQuery, withColumnFilter } from '@/utils/boardSearchParams';
 
 interface ColumnHeaderProps {
   column: ColumnType;
@@ -30,6 +32,9 @@ interface ColumnProps {
 
 const ColumnHeader = ({ column, setAddTaskIsHovered, onAddTaskClick }: ColumnHeaderProps) => {
   const dispatch = useAppDispatch();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { tableOperations } = useAppSelector(selectColumnTasks(column.id));
   const {
     register,
@@ -41,7 +46,7 @@ const ColumnHeader = ({ column, setAddTaskIsHovered, onAddTaskClick }: ColumnHea
     defaultValues: { name: column.name }
   });
 
-  const [isEditingName, setIsEditingName] = useState(false);
+  const [isEditingName, setIsEditingName] = useState<boolean>(false);
 
   const onDeleteColumn = async () => {
     await dispatch(deleteColumnAsync(column.id));
@@ -66,14 +71,20 @@ const ColumnHeader = ({ column, setAddTaskIsHovered, onAddTaskClick }: ColumnHea
   };
 
   const onToggleSorting = () => {
+    const sorting = NEXT_SORTING[tableOperations.sorting];
     dispatch(
       getTasksAsync({
         ...tableOperations,
         columnId: column.id,
-        sorting: NEXT_SORTING[tableOperations.sorting],
+        sorting,
         pageIndex: DEFAULT_TABLE_OPERATIONS.pageIndex
       })
     );
+    const updated = withColumnFilter(searchParams, column.id, {
+      sorting,
+      query: tableOperations.query
+    });
+    router.replace(`${pathname}?${updated.toString()}`, { scroll: false });
   };
 
   const SortIcon = SORT_ICONS[tableOperations.sorting];
@@ -146,6 +157,7 @@ const ColumnHeader = ({ column, setAddTaskIsHovered, onAddTaskClick }: ColumnHea
 
 const Column = ({ column }: ColumnProps) => {
   const dispatch = useAppDispatch();
+  const searchParams = useSearchParams();
   const [addTaskIsHovered, setAddTaskIsHovered] = useState<boolean>(false);
   const [isCreatingTask, setIsCreatingTask] = useState<boolean>(false);
   const { tasks, tableOperations, hasMore, isLoading } = useAppSelector(
@@ -153,7 +165,18 @@ const Column = ({ column }: ColumnProps) => {
   );
 
   useEffect(() => {
-    dispatch(getTasksAsync({ ...tableOperations, columnId: column.id }));
+    const columnFilter = parseFilters(searchParams)[column.id];
+    const globalQuery = parseGlobalQuery(searchParams);
+    const isGlobalSearch = !columnFilter && globalQuery !== '';
+    dispatch(
+      getTasksAsync({
+        ...DEFAULT_TABLE_OPERATIONS,
+        sorting: columnFilter?.sorting ?? DEFAULT_TABLE_OPERATIONS.sorting,
+        query: columnFilter?.query ?? globalQuery,
+        columnId: column.id,
+        isGlobalSearch
+      })
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, column.id]);
 
@@ -173,7 +196,7 @@ const Column = ({ column }: ColumnProps) => {
   };
 
   return (
-    <section className="w-64 h-[calc(100vh-150px)] flex flex-col overflow-y-hidden shrink-0 rounded-b-md bg-base-800">
+    <section className="w-64 flex flex-col overflow-y-hidden shrink-0 rounded-b-md bg-base-800">
       <ColumnHeader
         column={column}
         setAddTaskIsHovered={setAddTaskIsHovered}
