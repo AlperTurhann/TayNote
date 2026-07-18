@@ -6,6 +6,8 @@ import type { AppDispatch, RootState } from '@/lib/store';
 import { TableOpertions } from '@/models/TableOperations';
 import {
   ChangeTaskColumn,
+  ChangeTaskCompleted,
+  CompleteTask,
   CreateTask,
   DeleteTask,
   MoveTask,
@@ -108,6 +110,27 @@ const changeTaskColumnAsync = createAsyncThunk<
   return result;
 });
 
+const changeTaskCompletedAsync = createAsyncThunk<
+  TryCatchResult<ChangeTaskCompleted>,
+  CompleteTask,
+  ThunkConfig
+>('tasks/changeTaskCompletedAsync', async ({ id, completed, columnId }, thunkAPI) => {
+  const result = await tryCatch<ChangeTaskCompleted>(
+    axios
+      .patch<ChangeTaskCompleted>(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/tasks/${id}/change-complete`,
+        {
+          completed
+        }
+      )
+      .then((res) => res.data)
+  );
+  if (result.data) {
+    refetchColumn(thunkAPI, columnId);
+  }
+  return result;
+});
+
 const deleteTaskAsync = createAsyncThunk<TryCatchResult<string>, DeleteTask, ThunkConfig>(
   'tasks/deleteTaskAsync',
   async ({ taskId, columnId }, thunkAPI) => {
@@ -127,6 +150,7 @@ export {
   getTasksAsync,
   addTaskAsync,
   changeTaskColumnAsync,
+  changeTaskCompletedAsync,
   deleteTaskAsync,
   searchAllColumnsAsync
 };

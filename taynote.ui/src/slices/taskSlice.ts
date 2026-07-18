@@ -5,6 +5,7 @@ import { ColumnTasksState, TaskState } from '@/models/Task';
 import {
   addTaskAsync,
   changeTaskColumnAsync,
+  changeTaskCompletedAsync,
   deleteTaskAsync,
   getTasksAsync,
   searchAllColumnsAsync
@@ -79,6 +80,16 @@ const taskSlice = createSlice({
         state.updateTask.isLoading = true;
       })
       .addCase(changeTaskColumnAsync.fulfilled, (state, action) => {
+        state.updateTask.isLoading = false;
+        state.updateTask.error = action.payload.error ?? undefined;
+      });
+    //#endregion
+    //#region Change Task Column
+    builder
+      .addCase(changeTaskCompletedAsync.pending, (state) => {
+        state.updateTask.isLoading = true;
+      })
+      .addCase(changeTaskCompletedAsync.fulfilled, (state, action) => {
         state.updateTask.isLoading = false;
         state.updateTask.error = action.payload.error ?? undefined;
       });

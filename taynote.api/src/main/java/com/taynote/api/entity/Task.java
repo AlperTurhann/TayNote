@@ -30,6 +30,9 @@ public class Task {
     @JoinColumn(name = "column_id", nullable = false)
     private BoardColumn column;
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean completed = false;
+
     @Column(nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 
@@ -63,6 +66,14 @@ public class Task {
 
     public void setColumn(BoardColumn column) {
         this.column = column;
+    }
+
+    public boolean getCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
     }
 
     public Instant getCreatedAt() {

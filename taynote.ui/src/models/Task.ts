@@ -9,6 +9,7 @@ interface CreateTask {
 
 interface Task extends CreateTask {
   id: string;
+  completed: boolean;
 }
 
 interface ChangeTaskColumn {
@@ -16,8 +17,17 @@ interface ChangeTaskColumn {
   columnId: string;
 }
 
+interface ChangeTaskCompleted {
+  id: string;
+  completed: boolean;
+}
+
 interface MoveTask extends ChangeTaskColumn {
   sourceColumnId: string;
+}
+
+interface CompleteTask extends ChangeTaskCompleted {
+  columnId: string;
 }
 
 interface DeleteTask {
@@ -50,7 +60,9 @@ export type {
   CreateTask,
   Task,
   ChangeTaskColumn,
+  ChangeTaskCompleted,
   MoveTask,
+  CompleteTask,
   DeleteTask,
   TaskSearchResult,
   ColumnTasksState,

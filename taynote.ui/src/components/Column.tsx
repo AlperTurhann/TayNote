@@ -106,10 +106,20 @@ const ColumnHeader = ({ column, setAddTaskIsHovered, onAddTaskClick }: ColumnHea
         />
         {isEditingName ? (
           <>
-            <Button colorVariant="green" className="border border-b-0" onClick={confirmEditing}>
+            <Button
+              colorVariant="green"
+              className="border border-b-0"
+              onPointerDown={(e) => e.preventDefault()}
+              onClick={confirmEditing}
+            >
               <Check />
             </Button>
-            <Button colorVariant="red" className="border border-b-0" onClick={cancelEditing}>
+            <Button
+              colorVariant="red"
+              className="border border-b-0"
+              onPointerDown={(e) => e.preventDefault()}
+              onClick={cancelEditing}
+            >
               <X />
             </Button>
           </>

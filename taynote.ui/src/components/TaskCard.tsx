@@ -1,15 +1,16 @@
 'use client';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Pencil, X } from 'lucide-react';
+import { CheckCircle2, Pencil, X } from 'lucide-react';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 
 import { Button } from '@/components/base/Button';
 import Input from '@/components/base/Input';
 import { useAppDispatch } from '@/lib/hooks';
+import { cn } from '@/lib/utils';
 import { Task } from '@/models/Task';
 import { TaskFormData, TaskFormSchema } from '@/schemas/TaskSchema';
-import { addTaskAsync, deleteTaskAsync } from '@/services/taskService';
+import { addTaskAsync, changeTaskCompletedAsync, deleteTaskAsync } from '@/services/taskService';
 
 interface NewTaskCardProps {
   columnId: string;
@@ -90,25 +91,43 @@ const TaskCard = ({ task }: TaskCardProps) => {
     await dispatch(deleteTaskAsync({ taskId: task.id, columnId: task.columnId }));
   };
 
+  const onCompleteTask = async () => {
+    await dispatch(
+      changeTaskCompletedAsync({ id: task.id, completed: !task.completed, columnId: task.columnId })
+    );
+  };
+
   return (
-    <div className="w-full p-2 bg-base-700 border-l-4" style={{ borderLeftColor: task.color }}>
+    <div
+      className={cn(
+        'w-full relative flex flex-col p-2 gap-y-2 border-l-4',
+        task.completed ? 'bg-base-900/50' : 'bg-base-700'
+      )}
+      style={{ borderLeftColor: task.color }}
+    >
       <div className="flex justify-between gap-x-2">
         {task.title}
         <div className="h-fit flex items-center">
-          <button
-            className="size-6 rounded-full place-items-center hover:bg-white/10 disabled:text-gray-500/50 disabled:pointer-events-none"
-            onClick={() => {}}
+          <Button
+            colorVariant="ghost"
+            className="rounded-full disabled:text-gray-500/50 disabled:pointer-events-none"
             disabled
           >
             <Pencil size={14} />
-          </button>
-          <button
-            className="size-6 rounded-full place-items-center hover:bg-white/10"
-            onClick={onDeleteTask}
-          >
+          </Button>
+          <Button colorVariant="ghost" className="rounded-full" onClick={onDeleteTask}>
             <X size={16} />
-          </button>
+          </Button>
         </div>
+      </div>
+      <div className="flex justify-end">
+        <Button
+          colorVariant="ghost"
+          className={cn('rounded-full p-0', task.completed && 'bg-green-900')}
+          onClick={onCompleteTask}
+        >
+          <CheckCircle2 />
+        </Button>
       </div>
     </div>
   );

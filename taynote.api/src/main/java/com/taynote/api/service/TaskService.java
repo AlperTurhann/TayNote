@@ -59,6 +59,12 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
+    public Task changeCompleted(UUID id, boolean completed) {
+        Task task = taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
+        task.setCompleted(completed);
+        return taskRepository.save(task);
+    }
+
     private BoardColumn findColumn(UUID columnId) {
         return columnRepository.findById(columnId).orElseThrow(() -> new ColumnNotFoundException(columnId));
     }
