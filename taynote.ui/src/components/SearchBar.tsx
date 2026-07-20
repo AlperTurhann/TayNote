@@ -5,8 +5,10 @@ import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { Button } from './base/Button';
+import { LoadingSpinner } from '@/components/base/LoadingSpinner';
 import { DEFAULT_TABLE_OPERATIONS } from '@/constants/generalConstants';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import { cn } from '@/lib/utils';
 import { getTasksAsync, searchAllColumnsAsync } from '@/services/taskService';
 import { selectColumnTasks, selectGlobalQuery } from '@/slices/taskSlice';
 import {
@@ -18,6 +20,7 @@ import {
 
 interface ColumnSearchBarProps {
   columnId: string;
+  isLoading?: boolean;
 }
 
 const TaskSearchBar = () => {
@@ -60,7 +63,7 @@ const TaskSearchBar = () => {
   );
 };
 
-const ColumnSearchBar = ({ columnId }: ColumnSearchBarProps) => {
+const ColumnSearchBar = ({ columnId, isLoading = false }: ColumnSearchBarProps) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -98,15 +101,19 @@ const ColumnSearchBar = ({ columnId }: ColumnSearchBarProps) => {
   return (
     <form
       onSubmit={handleSubmit((data) => onSubmit(data.query))}
-      className="flex items-center justify-between border gap-x-2 bg-base-600"
+      className={cn(
+        'flex items-center justify-between border gap-x-2 bg-base-600',
+        isLoading && 'opacity-100'
+      )}
     >
       <input
         {...register('query')}
         placeholder="Search column"
         className="w-full px-4 focus:outline-none"
+        disabled={isLoading}
       />
-      <Button colorVariant="white" type="submit" className="shrink-0">
-        <Search size={20} />
+      <Button colorVariant="white" type="submit" className="shrink-0" disabled={isLoading}>
+        {isLoading ? <LoadingSpinner className="size-5" /> : <Search size={20} />}
       </Button>
     </form>
   );

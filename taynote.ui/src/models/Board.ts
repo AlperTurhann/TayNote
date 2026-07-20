@@ -6,4 +6,9 @@ interface Board extends CreateBoard {
   id: string;
 }
 
-export type { CreateBoard, Board };
+interface BoardWithStatus extends Board {
+  isUpdating: boolean;
+  isDeleting: boolean;
+}
+
+export type { CreateBoard, Board, BoardWithStatus };

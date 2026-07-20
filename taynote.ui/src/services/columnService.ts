@@ -1,7 +1,8 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-import { Column, CreateColumn, UpdateColumn } from '@/models/Column';
+import { Column, CreateColumn, DeleteColumn, UpdateColumn } from '@/models/Column';
+import { ThunkConfig } from '@/models/FetchOperations';
 import { tryCatch, TryCatchResult } from '@/utils/tryCatch';
 
 const getColumnsAsync = createAsyncThunk(
@@ -38,14 +39,18 @@ const updateColumnAsync = createAsyncThunk(
   }
 );
 
-const deleteColumnAsync = createAsyncThunk(
+const deleteColumnAsync = createAsyncThunk<TryCatchResult<void>, DeleteColumn, ThunkConfig>(
   'columns/deleteColumnAsync',
-  async (columnId: string): Promise<TryCatchResult<void>> => {
-    return await tryCatch<void>(
+  async ({ columnId, boardId }, { dispatch }) => {
+    const result = await tryCatch<void>(
       axios
         .delete<void>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/columns/${columnId}`)
         .then((res) => res.data)
     );
+    if (!result.error) {
+      dispatch(getColumnsAsync(boardId));
+    }
+    return result;
   }
 );
 

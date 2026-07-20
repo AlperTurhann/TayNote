@@ -15,4 +15,6 @@ const EMPTY_COLUMN_TASKS_STATE: ColumnTasksState = {
   isLoading: false
 };
 
-export { DEFAULT_TABLE_OPERATIONS, EMPTY_COLUMN_TASKS_STATE };
+const SKELETON_KEYS = ['skeleton-1', 'skeleton-2', 'skeleton-3'];
+
+export { DEFAULT_TABLE_OPERATIONS, EMPTY_COLUMN_TASKS_STATE, SKELETON_KEYS };

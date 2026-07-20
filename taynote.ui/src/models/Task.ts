@@ -12,6 +12,11 @@ interface Task extends CreateTask {
   completed: boolean;
 }
 
+interface TaskWithStatus extends Task {
+  isUpdating: boolean;
+  isDeleting: boolean;
+}
+
 interface UpdateTask extends Partial<Task> {
   id: string;
   columnId: string;
@@ -34,7 +39,7 @@ interface TaskSearchResult {
 }
 
 interface ColumnTasksState {
-  tasks: Task[];
+  tasks: TaskWithStatus[];
   tableOperations: Omit<TableOpertions, 'columnId'>;
   hasMore: boolean;
   isLoading: boolean;
@@ -45,13 +50,12 @@ interface TaskState {
   byColumn: Record<string, ColumnTasksState>;
   globalQuery: string;
   addTask: FetchOperations;
-  updateTask: FetchOperations;
-  deleteTask: FetchOperations;
 }
 
 export type {
   CreateTask,
   Task,
+  TaskWithStatus,
   UpdateTask,
   MoveTask,
   DeleteTask,

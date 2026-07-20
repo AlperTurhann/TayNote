@@ -6,10 +6,12 @@ import { useForm } from 'react-hook-form';
 
 import { Button } from '@/components/base/Button';
 import Input from '@/components/base/Input';
+import { LoadingSpinner } from '@/components/base/LoadingSpinner';
+import { Skeleton } from '@/components/ui/skeleton';
 import { VerificationRequiredButton } from '@/components/VerificationRequiredButton';
 import { useAppDispatch } from '@/lib/hooks';
 import { cn } from '@/lib/utils';
-import { Task } from '@/models/Task';
+import { TaskWithStatus } from '@/models/Task';
 import { TaskFormData, TaskFormSchema } from '@/schemas/TaskSchema';
 import { addTaskAsync, deleteTaskAsync, updateTaskAsync } from '@/services/taskService';
 
@@ -19,13 +21,27 @@ interface NewTaskCardProps {
 }
 
 interface TaskCardProps {
-  task: Task;
+  task: TaskWithStatus;
 }
 
-const SkeletonTaskCard = () => {
+const NewTaskPlaceholder = () => {
   return (
     <div className="w-full h-56 flex items-center justify-center animate-pulse bg-base-700/10">
       <p className="text-base-300/50">New Task</p>
+    </div>
+  );
+};
+
+const TaskCardSkeleton = () => {
+  return (
+    <div className="w-full flex flex-col p-2 gap-y-2 border-l-4 border-base-600 bg-base-700">
+      <div className="flex justify-between gap-x-2">
+        <Skeleton className="h-4 w-2/3 bg-base-600" />
+        <Skeleton className="size-6 rounded-full bg-base-600" />
+      </div>
+      <div className="flex justify-end">
+        <Skeleton className="size-6 rounded-full bg-base-600" />
+      </div>
     </div>
   );
 };
@@ -37,7 +53,7 @@ const NewTaskCard = ({ columnId, onCancel }: NewTaskCardProps) => {
     handleSubmit,
     watch,
     setValue,
-    formState: { errors }
+    formState: { errors, isSubmitting }
   } = useForm<TaskFormData>({
     resolver: zodResolver(TaskFormSchema),
     defaultValues: { color: '#4f46e5' }
@@ -74,7 +90,7 @@ const NewTaskCard = ({ columnId, onCancel }: NewTaskCardProps) => {
         className="w-full"
       />
       <div className="grid grid-cols-2 gap-x-2">
-        <Button colorVariant="green" type="submit" className="rounded">
+        <Button colorVariant="green" type="submit" className="rounded" disabled={isSubmitting}>
           Add
         </Button>
         <Button colorVariant="base" className="rounded" onClick={onCancel}>
@@ -87,6 +103,7 @@ const NewTaskCard = ({ columnId, onCancel }: NewTaskCardProps) => {
 
 const TaskCard = ({ task }: TaskCardProps) => {
   const dispatch = useAppDispatch();
+  const { isUpdating, isDeleting, ...taskData } = task;
 
   const {
     register,
@@ -106,7 +123,7 @@ const TaskCard = ({ task }: TaskCardProps) => {
   };
 
   const onCompleteTask = async () => {
-    await dispatch(updateTaskAsync({ ...task, completed: !task.completed }));
+    await dispatch(updateTaskAsync({ ...taskData, completed: !task.completed }));
   };
 
   const closeEditingTitle = () => {
@@ -123,7 +140,7 @@ const TaskCard = ({ task }: TaskCardProps) => {
     if (!isEditingTitleRef.current) return;
     const trimmed = title.trim();
     if (trimmed && trimmed !== task.title) {
-      await dispatch(updateTaskAsync({ ...task, title: trimmed }));
+      await dispatch(updateTaskAsync({ ...taskData, title: trimmed }));
     }
     closeEditingTitle();
   });
@@ -137,8 +154,9 @@ const TaskCard = ({ task }: TaskCardProps) => {
   return (
     <div
       className={cn(
-        'w-full relative flex flex-col p-2 gap-y-2 border-l-4',
-        task.completed ? 'bg-base-900/50' : 'bg-base-700'
+        'w-full relative flex flex-col transition-colors duration-200 p-2 gap-y-2 border-l-4',
+        task.completed ? 'bg-base-900/50' : 'bg-base-700',
+        (isUpdating || isDeleting) && 'opacity-50'
       )}
       style={{ borderLeftColor: task.color }}
     >
@@ -170,6 +188,7 @@ const TaskCard = ({ task }: TaskCardProps) => {
                 className="border"
                 onPointerDown={(e) => e.preventDefault()}
                 onClick={confirmEditingTitle}
+                disabled={isUpdating}
               >
                 <Check size={14} />
               </Button>
@@ -195,7 +214,7 @@ const TaskCard = ({ task }: TaskCardProps) => {
               )}
               <VerificationRequiredButton
                 button={
-                  <Button colorVariant="ghost" className="rounded-full p-1">
+                  <Button colorVariant="ghost" className="rounded-full p-1" disabled={isDeleting}>
                     <X size={16} />
                   </Button>
                 }
@@ -206,12 +225,14 @@ const TaskCard = ({ task }: TaskCardProps) => {
           )}
         </div>
       </div>
-      <div className="flex justify-end">
+      <div className="flex items-center justify-between">
+        <div>{(isUpdating || isDeleting) && <LoadingSpinner className="size-4" />}</div>
         {!isEditingTitle && (
           <Button
             colorVariant="ghost"
             className={cn('rounded-full p-0', task.completed && 'bg-green-900')}
             onClick={onCompleteTask}
+            disabled={isUpdating}
           >
             <CheckCircle2 />
           </Button>
@@ -221,4 +242,4 @@ const TaskCard = ({ task }: TaskCardProps) => {
   );
 };
 
-export { SkeletonTaskCard, NewTaskCard, TaskCard };
+export { NewTaskPlaceholder, TaskCardSkeleton, NewTaskCard, TaskCard };

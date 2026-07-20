@@ -5,16 +5,17 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { Button } from './base/Button';
-import Input from './base/Input';
+import { Button } from '@/components/base/Button';
+import Input from '@/components/base/Input';
 import { ColumnSearchBar } from '@/components/SearchBar';
-import { NewTaskCard, SkeletonTaskCard, TaskCard } from '@/components/TaskCard';
+import { NewTaskCard, NewTaskPlaceholder, TaskCard, TaskCardSkeleton } from '@/components/TaskCard';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Skeleton } from '@/components/ui/skeleton';
 import { VerificationRequiredButton } from '@/components/VerificationRequiredButton';
 import { NEXT_SORTING, SORT_ICONS } from '@/constants/boardConstants';
-import { DEFAULT_TABLE_OPERATIONS } from '@/constants/generalConstants';
+import { DEFAULT_TABLE_OPERATIONS, SKELETON_KEYS } from '@/constants/generalConstants';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
-import { Column as ColumnType } from '@/models/Column';
+import { ColumnWithStatus } from '@/models/Column';
 import { ColumnFormData, ColumnFormSchema } from '@/schemas/ColumnSchema';
 import { deleteColumnAsync, updateColumnAsync } from '@/services/columnService';
 import { getTasksAsync } from '@/services/taskService';
@@ -22,14 +23,23 @@ import { selectColumnTasks } from '@/slices/taskSlice';
 import { parseFilters, parseGlobalQuery, withColumnFilter } from '@/utils/boardSearchParams';
 
 interface ColumnHeaderProps {
-  column: ColumnType;
+  column: ColumnWithStatus;
   setAddTaskIsHovered: React.Dispatch<React.SetStateAction<boolean>>;
   onAddTaskClick: () => void;
 }
 
 interface ColumnProps {
-  column: ColumnType;
+  column: ColumnWithStatus;
 }
+
+const ColumnSkeleton = () => {
+  return (
+    <section className="w-64 flex flex-col shrink-0 rounded-b-md bg-base-800">
+      <Skeleton className="h-9 w-full rounded-none bg-indigo-900" />
+      <Skeleton className="h-8 w-full rounded-none bg-base-600" />
+    </section>
+  );
+};
 
 const ColumnHeader = ({ column, setAddTaskIsHovered, onAddTaskClick }: ColumnHeaderProps) => {
   const dispatch = useAppDispatch();
@@ -37,6 +47,7 @@ const ColumnHeader = ({ column, setAddTaskIsHovered, onAddTaskClick }: ColumnHea
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { tableOperations } = useAppSelector(selectColumnTasks(column.id));
+  const { isUpdating, isDeleting } = column;
   const {
     register,
     handleSubmit,
@@ -50,7 +61,7 @@ const ColumnHeader = ({ column, setAddTaskIsHovered, onAddTaskClick }: ColumnHea
   const [isEditingName, setIsEditingName] = useState<boolean>(false);
 
   const onDeleteColumn = async () => {
-    await dispatch(deleteColumnAsync(column.id));
+    await dispatch(deleteColumnAsync({ columnId: column.id, boardId: column.boardId }));
   };
 
   const startEditing = () => {
@@ -91,11 +102,11 @@ const ColumnHeader = ({ column, setAddTaskIsHovered, onAddTaskClick }: ColumnHea
   const SortIcon = SORT_ICONS[tableOperations.sorting];
 
   return (
-    <div className="">
-      <div className="flex shrink-0 border-b bg-indigo-900">
+    <>
+      <div className="flex items-center shrink-0 border-b bg-indigo-900">
         <Button
           colorVariant="white"
-          className="border border-b-0"
+          className="h-full border border-b-0"
           onClick={onToggleSorting}
           title={`Sorting: ${tableOperations.sorting}`}
         >
@@ -108,13 +119,16 @@ const ColumnHeader = ({ column, setAddTaskIsHovered, onAddTaskClick }: ColumnHea
           placeholder="New Column"
           readOnly={!isEditingName}
           onFocus={startEditing}
-          onBlur={cancelEditing}
+          onBlur={() => {
+            if (!isUpdating) cancelEditing();
+          }}
           onKeyDown={(e) => {
             if (e.key === 'Enter') confirmEditing();
             if (e.key === 'Escape') cancelEditing();
           }}
           iconError
           className="w-full rounded-none bg-transparent p-2 text-center font-bold text-base-100"
+          disabled={isUpdating || isDeleting}
         />
         {isEditingName ? (
           <>
@@ -123,6 +137,7 @@ const ColumnHeader = ({ column, setAddTaskIsHovered, onAddTaskClick }: ColumnHea
               className="border border-b-0"
               onPointerDown={(e) => e.preventDefault()}
               onClick={confirmEditing}
+              disabled={isUpdating}
             >
               <Check />
             </Button>
@@ -131,6 +146,7 @@ const ColumnHeader = ({ column, setAddTaskIsHovered, onAddTaskClick }: ColumnHea
               className="border border-b-0"
               onPointerDown={(e) => e.preventDefault()}
               onClick={cancelEditing}
+              disabled={isUpdating}
             >
               <X />
             </Button>
@@ -142,12 +158,13 @@ const ColumnHeader = ({ column, setAddTaskIsHovered, onAddTaskClick }: ColumnHea
               onPointerEnter={() => setAddTaskIsHovered(true)}
               onPointerLeave={() => setAddTaskIsHovered(false)}
               onClick={onAddTaskClick}
+              disabled={isDeleting}
             >
               <Plus />
             </Button>
             <VerificationRequiredButton
               button={
-                <Button colorVariant="red" className="border border-b-0">
+                <Button colorVariant="red" className="border border-b-0" disabled={isDeleting}>
                   <Trash2 />
                 </Button>
               }
@@ -157,8 +174,8 @@ const ColumnHeader = ({ column, setAddTaskIsHovered, onAddTaskClick }: ColumnHea
           </>
         )}
       </div>
-      <ColumnSearchBar columnId={column.id} />
-    </div>
+      <ColumnSearchBar columnId={column.id} isLoading={isUpdating || isDeleting} />
+    </>
   );
 };
 
@@ -211,17 +228,17 @@ const Column = ({ column }: ColumnProps) => {
       />
       <ScrollArea className="min-h-0 flex-1 p-1" onScroll={onScroll}>
         <div className="flex flex-col items-center gap-y-1">
-          {!isCreatingTask && addTaskIsHovered && <SkeletonTaskCard />}
+          {!isCreatingTask && addTaskIsHovered && <NewTaskPlaceholder />}
           {isCreatingTask && (
             <NewTaskCard columnId={column.id} onCancel={() => setIsCreatingTask(false)} />
           )}
-          {tasks.map((task) => (
-            <TaskCard key={task.id} task={task} />
-          ))}
+          {isLoading && tasks.length === 0
+            ? SKELETON_KEYS.map((key) => <TaskCardSkeleton key={key} />)
+            : tasks.map((task) => <TaskCard key={task.id} task={task} />)}
         </div>
       </ScrollArea>
     </section>
   );
 };
 
-export { Column };
+export { ColumnSkeleton, Column };

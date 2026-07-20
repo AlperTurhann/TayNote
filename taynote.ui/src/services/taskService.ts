@@ -2,7 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 import { DEFAULT_TABLE_OPERATIONS } from '@/constants/generalConstants';
-import type { AppDispatch, RootState } from '@/lib/store';
+import { RefetchProps, ThunkConfig } from '@/models/FetchOperations';
 import { TableOpertions } from '@/models/TableOperations';
 import {
   UpdateTask,
@@ -13,8 +13,6 @@ import {
   TaskSearchResult
 } from '@/models/Task';
 import { tryCatch, TryCatchResult } from '@/utils/tryCatch';
-
-type ThunkConfig = { dispatch: AppDispatch; state: RootState };
 
 interface GetTasksArgs extends TableOpertions {
   isGlobalSearch?: boolean;
@@ -35,10 +33,7 @@ const getTasksAsync = createAsyncThunk(
   }
 );
 
-const refetchColumn = (
-  { dispatch, getState }: { dispatch: AppDispatch; getState: () => RootState },
-  columnId: string
-) => {
+const refetchColumn = ({ dispatch, getState }: RefetchProps, columnId: string) => {
   const tableOperations =
     getState().task.byColumn[columnId]?.tableOperations ?? DEFAULT_TABLE_OPERATIONS;
   dispatch(

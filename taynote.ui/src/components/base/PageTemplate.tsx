@@ -12,7 +12,7 @@ const PageTemplate = ({ children, className }: Props) => {
   return (
     <div className="h-screen flex flex-col overflow-hidden">
       <Header />
-      <div className={cn('flex flex-col flex-1 p-4 gap-y-4', className)}>{children}</div>
+      <div className={cn('flex flex-col flex-1 min-h-0 p-4 gap-y-4', className)}>{children}</div>
     </div>
   );
 };

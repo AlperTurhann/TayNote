@@ -19,16 +19,13 @@ const getOrCreateColumnState = (state: TaskState, columnId: string): ColumnTasks
   return state.byColumn[columnId];
 };
 
+const findTask = (state: TaskState, columnId: string, taskId: string) =>
+  state.byColumn[columnId]?.tasks.find((task) => task.id === taskId);
+
 const initialState: TaskState = {
   byColumn: {},
   globalQuery: '',
   addTask: {
-    isLoading: false
-  },
-  updateTask: {
-    isLoading: false
-  },
-  deleteTask: {
     isLoading: false
   }
 };
@@ -50,8 +47,15 @@ const taskSlice = createSlice({
         if (!columnId) return;
         const columnState = getOrCreateColumnState(state, columnId);
         const { items, hasMore } = action.payload.data ?? { items: [], hasMore: false };
+        const itemsWithStatus = items.map((item) => ({
+          ...item,
+          isUpdating: false,
+          isDeleting: false
+        }));
         columnState.tasks =
-          tableOperations.pageIndex <= 1 ? items : [...columnState.tasks, ...items];
+          tableOperations.pageIndex <= 1
+            ? itemsWithStatus
+            : [...columnState.tasks, ...itemsWithStatus];
         if (!isGlobalSearch) {
           columnState.tableOperations = tableOperations;
         }
@@ -82,32 +86,35 @@ const taskSlice = createSlice({
     //#endregion
     //#region Update Task
     builder
-      .addCase(updateTaskAsync.pending, (state) => {
-        state.updateTask.isLoading = true;
+      .addCase(updateTaskAsync.pending, (state, action) => {
+        const task = findTask(state, action.meta.arg.columnId, action.meta.arg.id);
+        if (task) task.isUpdating = true;
       })
       .addCase(updateTaskAsync.fulfilled, (state, action) => {
-        state.updateTask.isLoading = false;
-        state.updateTask.error = action.payload.error ?? undefined;
+        const task = findTask(state, action.meta.arg.columnId, action.meta.arg.id);
+        if (task) task.isUpdating = false;
       });
     //#endregion
     //#region Update Task Column
     builder
-      .addCase(updateTaskColumnAsync.pending, (state) => {
-        state.updateTask.isLoading = true;
+      .addCase(updateTaskColumnAsync.pending, (state, action) => {
+        const task = findTask(state, action.meta.arg.sourceColumnId, action.meta.arg.id);
+        if (task) task.isUpdating = true;
       })
       .addCase(updateTaskColumnAsync.fulfilled, (state, action) => {
-        state.updateTask.isLoading = false;
-        state.updateTask.error = action.payload.error ?? undefined;
+        const task = findTask(state, action.meta.arg.sourceColumnId, action.meta.arg.id);
+        if (task) task.isUpdating = false;
       });
     //#endregion
     //#region Delete Task
     builder
-      .addCase(deleteTaskAsync.pending, (state) => {
-        state.deleteTask.isLoading = true;
+      .addCase(deleteTaskAsync.pending, (state, action) => {
+        const task = findTask(state, action.meta.arg.columnId, action.meta.arg.taskId);
+        if (task) task.isDeleting = true;
       })
       .addCase(deleteTaskAsync.fulfilled, (state, action) => {
-        state.deleteTask.isLoading = false;
-        state.deleteTask.error = action.payload.error ?? undefined;
+        const task = findTask(state, action.meta.arg.columnId, action.meta.arg.taskId);
+        if (task) task.isDeleting = false;
       });
     //#endregion
   }

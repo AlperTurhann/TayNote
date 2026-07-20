@@ -5,7 +5,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 
 const linkVariants = cva(
-  'flex items-center justify-center whitespace-nowrap font-bold p-2 gap-x-1 text-base-100',
+  'flex items-center justify-center whitespace-nowrap font-bold p-2 gap-x-1 text-base-100 disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       color: {

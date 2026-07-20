@@ -8,9 +8,19 @@ interface Column extends CreateColumn {
   orderNo: number;
 }
 
+interface ColumnWithStatus extends Column {
+  isUpdating: boolean;
+  isDeleting: boolean;
+}
+
 type UpdateColumn = { id: string } & (
   | { name: string; orderNo?: number }
   | { name?: string; orderNo: number }
 );
 
-export type { CreateColumn, Column, UpdateColumn };
+interface DeleteColumn {
+  columnId: string;
+  boardId: string;
+}
+
+export type { CreateColumn, Column, ColumnWithStatus, UpdateColumn, DeleteColumn };

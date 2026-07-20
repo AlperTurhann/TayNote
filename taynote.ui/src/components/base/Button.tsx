@@ -4,11 +4,11 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'flex items-center justify-center whitespace-nowrap font-bold p-2 gap-x-1 text-base-100',
+  'flex items-center justify-center whitespace-nowrap font-bold p-2 gap-x-1 text-base-100 disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       color: {
-        default: 'bg-indigo-950 hover:bg-indigo-800',
+        default: 'bg-indigo-950 disabled:hover:bg-indigo-800',
         secondary: 'bg-base-700 hover:bg-base-600',
         green: 'bg-green-900 hover:bg-green-800',
         red: 'bg-red-950 hover:bg-red-900',

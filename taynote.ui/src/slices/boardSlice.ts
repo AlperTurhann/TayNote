@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { Board } from '@/models/Board';
+import { BoardWithStatus } from '@/models/Board';
 import { FetchOperations } from '@/models/FetchOperations';
 import {
   addBoardAsync,
@@ -10,11 +10,9 @@ import {
 } from '@/services/boardService';
 
 interface BoardState {
-  boards: Board[];
+  boards: BoardWithStatus[];
   getBoards: FetchOperations;
   addBoard: FetchOperations;
-  updateBoard: FetchOperations;
-  deleteBoard: FetchOperations;
 }
 
 const initialState: BoardState = {
@@ -24,14 +22,11 @@ const initialState: BoardState = {
   },
   addBoard: {
     isLoading: false
-  },
-  updateBoard: {
-    isLoading: false
-  },
-  deleteBoard: {
-    isLoading: false
   }
 };
+
+const findBoard = (state: BoardState, boardId: string) =>
+  state.boards.find((board) => board.id === boardId);
 
 const boardSlice = createSlice({
   name: 'board',
@@ -44,7 +39,11 @@ const boardSlice = createSlice({
         state.getBoards.isLoading = true;
       })
       .addCase(getBoardsAsync.fulfilled, (state, action) => {
-        state.boards = action.payload.data ?? [];
+        state.boards = (action.payload.data ?? []).map((board) => ({
+          ...board,
+          isUpdating: false,
+          isDeleting: false
+        }));
         state.getBoards.isLoading = false;
         state.getBoards.error = action.payload.error ?? undefined;
       });
@@ -61,27 +60,33 @@ const boardSlice = createSlice({
     //#endregion
     //#region Update Board
     builder
-      .addCase(updateBoardAsync.pending, (state) => {
-        state.updateBoard.isLoading = true;
+      .addCase(updateBoardAsync.pending, (state, action) => {
+        const board = findBoard(state, action.meta.arg.id);
+        if (board) board.isUpdating = true;
       })
       .addCase(updateBoardAsync.fulfilled, (state, action) => {
-        state.updateBoard.isLoading = false;
-        state.updateBoard.error = action.payload.error ?? undefined;
+        const board = findBoard(state, action.meta.arg.id);
+        if (board) board.isUpdating = false;
       });
     //#endregion
     //#region Delete Board
     builder
-      .addCase(deleteBoardAsync.pending, (state) => {
-        state.deleteBoard.isLoading = true;
+      .addCase(deleteBoardAsync.pending, (state, action) => {
+        const board = findBoard(state, action.meta.arg);
+        if (board) board.isDeleting = true;
       })
       .addCase(deleteBoardAsync.fulfilled, (state, action) => {
-        state.deleteBoard.isLoading = false;
-        state.deleteBoard.error = action.payload.error ?? undefined;
+        const board = findBoard(state, action.meta.arg);
+        if (board) board.isDeleting = false;
       });
     //#endregion
   }
 });
 
 export const selectBoards = (state: { board: BoardState }) => state.board.boards;
+export const selectBoardIsCreating = (state: { board: BoardState }) =>
+  state.board.addBoard.isLoading;
+export const selectGetBoardsIsLoading = (state: { board: BoardState }) =>
+  state.board.getBoards.isLoading;
 
 export default boardSlice.reducer;
