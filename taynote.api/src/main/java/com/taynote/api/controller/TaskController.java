@@ -49,9 +49,9 @@ public class TaskController {
         return taskService.update(id, request);
     }
 
-    @PatchMapping("/{id}/update-column")
-    public UpdateTaskColumnResponse updateColumn(@PathVariable UUID id, @RequestBody UpdateTaskColumnRequest request) {
-        return taskService.updateColumn(id, request.getColumnId());
+    @PatchMapping("/{id}/move")
+    public UpdateTaskColumnResponse move(@PathVariable UUID id, @RequestBody UpdateTaskColumnRequest request) {
+        return taskService.move(id, request.getColumnId(), request.getTargetIndex());
     }
 
     @DeleteMapping(value = "/{id}")

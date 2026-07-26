@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.taynote.api.dto.board.BoardDto;
 import com.taynote.api.dto.board.request.CreateBoardRequest;
+import com.taynote.api.dto.board.request.MoveBoardRequest;
 import com.taynote.api.dto.board.request.UpdateBoardRequest;
 import com.taynote.api.dto.board.response.CreateBoardResponse;
 import com.taynote.api.dto.board.response.UpdateBoardResponse;
@@ -46,6 +47,11 @@ public class BoardController {
     @PatchMapping("/{id}")
     public UpdateBoardResponse update(@PathVariable UUID id, @RequestBody UpdateBoardRequest request) {
         return boardService.update(id, request);
+    }
+
+    @PatchMapping("/{id}/move")
+    public UpdateBoardResponse move(@PathVariable UUID id, @RequestBody MoveBoardRequest request) {
+        return boardService.move(id, request.getTargetIndex());
     }
 
     @DeleteMapping(value = "/{id}")

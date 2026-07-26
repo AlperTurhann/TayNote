@@ -1,4 +1,6 @@
 'use client';
+import { useDroppable } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Check, Plus, Trash2, X } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
@@ -7,8 +9,14 @@ import { useForm } from 'react-hook-form';
 
 import { Button } from '@/components/base/Button';
 import Input from '@/components/base/Input';
+import { SortableTaskCard } from '@/components/dnd/SortableTaskCard';
 import { ColumnSearchBar } from '@/components/SearchBar';
-import { NewTaskCard, NewTaskPlaceholder, TaskCard, TaskCardSkeleton } from '@/components/TaskCard';
+import {
+  NewTaskCard,
+  NewTaskPlaceholder,
+  TaskCardSkeleton,
+  TaskDropPlaceholder
+} from '@/components/TaskCard';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { VerificationRequiredButton } from '@/components/VerificationRequiredButton';
@@ -28,8 +36,14 @@ interface ColumnHeaderProps {
   onAddTaskClick: () => void;
 }
 
+interface ColumnDragOverlayProps {
+  name: string;
+}
+
 interface ColumnProps {
   column: ColumnWithStatus;
+  placeholderIndex?: number | null;
+  taskCrossedColumn?: boolean;
 }
 
 const ColumnSkeleton = () => {
@@ -38,6 +52,20 @@ const ColumnSkeleton = () => {
       <Skeleton className="h-9 w-full rounded-none bg-indigo-900" />
       <Skeleton className="h-8 w-full rounded-none bg-base-600" />
     </section>
+  );
+};
+
+const ColumnDropPlaceholder = () => {
+  return (
+    <div className="w-64 h-full shrink-0 rounded-md border-2 border-dashed border-indigo-500/50" />
+  );
+};
+
+const ColumnDragOverlay = ({ name }: ColumnDragOverlayProps) => {
+  return (
+    <div className="h-10 place-content-center border bg-indigo-900">
+      <p className="p-2 text-center font-bold text-base-100">{name}</p>
+    </div>
   );
 };
 
@@ -179,7 +207,7 @@ const ColumnHeader = ({ column, setAddTaskIsHovered, onAddTaskClick }: ColumnHea
   );
 };
 
-const Column = ({ column }: ColumnProps) => {
+const Column = ({ column, placeholderIndex = null, taskCrossedColumn = false }: ColumnProps) => {
   const dispatch = useAppDispatch();
   const searchParams = useSearchParams();
   const [addTaskIsHovered, setAddTaskIsHovered] = useState<boolean>(false);
@@ -187,6 +215,11 @@ const Column = ({ column }: ColumnProps) => {
   const { tasks, tableOperations, hasMore, isLoading } = useAppSelector(
     selectColumnTasks(column.id)
   );
+  const dragDisabled = tableOperations.sorting !== 'none';
+  const { setNodeRef: setDropZoneRef } = useDroppable({
+    id: `tasks-${column.id}`,
+    data: { type: 'column-tasks', columnId: column.id }
+  });
 
   useEffect(() => {
     const columnFilter = parseFilters(searchParams)[column.id];
@@ -227,18 +260,37 @@ const Column = ({ column }: ColumnProps) => {
         onAddTaskClick={() => setIsCreatingTask(true)}
       />
       <ScrollArea className="min-h-0 flex-1 p-1" onScroll={onScroll}>
-        <div className="flex flex-col items-center gap-y-1">
+        <div ref={setDropZoneRef} className="flex flex-col items-center gap-y-1">
           {!isCreatingTask && addTaskIsHovered && <NewTaskPlaceholder />}
           {isCreatingTask && (
             <NewTaskCard columnId={column.id} onCancel={() => setIsCreatingTask(false)} />
           )}
-          {isLoading && tasks.length === 0
-            ? SKELETON_KEYS.map((key) => <TaskCardSkeleton key={key} />)
-            : tasks.map((task) => <TaskCard key={task.id} task={task} />)}
+          {isLoading && tasks.length === 0 ? (
+            SKELETON_KEYS.map((key) => <TaskCardSkeleton key={key} />)
+          ) : (
+            <SortableContext
+              items={tasks.map((task) => task.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              {tasks.flatMap((task, index) => [
+                ...(placeholderIndex === index
+                  ? [<TaskDropPlaceholder key="drop-placeholder" />]
+                  : []),
+                <SortableTaskCard
+                  key={task.id}
+                  task={task}
+                  columnId={column.id}
+                  disabled={dragDisabled}
+                  hideWhileDragging={taskCrossedColumn}
+                />
+              ])}
+              {placeholderIndex === tasks.length && <TaskDropPlaceholder key="drop-placeholder" />}
+            </SortableContext>
+          )}
         </div>
       </ScrollArea>
     </section>
   );
 };
 
-export { ColumnSkeleton, Column };
+export { ColumnSkeleton, ColumnDropPlaceholder, ColumnDragOverlay, Column };

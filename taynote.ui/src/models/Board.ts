@@ -11,4 +11,9 @@ interface BoardWithStatus extends Board {
   isDeleting: boolean;
 }
 
-export type { CreateBoard, Board, BoardWithStatus };
+interface MoveBoard {
+  id: string;
+  targetIndex: number;
+}
+
+export type { CreateBoard, Board, BoardWithStatus, MoveBoard };

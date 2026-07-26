@@ -29,6 +29,9 @@ public class Task {
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean completed = false;
 
+    @Column(name = "order_no", nullable = false, columnDefinition = "integer not null default 0")
+    private int orderNo;
+
     @Column(nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 
@@ -66,6 +69,14 @@ public class Task {
 
     public void setCompleted(boolean completed) {
         this.completed = completed;
+    }
+
+    public int getOrderNo() {
+        return orderNo;
+    }
+
+    public void setOrderNo(int orderNo) {
+        this.orderNo = orderNo;
     }
 
     public Instant getCreatedAt() {

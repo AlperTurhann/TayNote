@@ -40,7 +40,7 @@ public class TaskService {
         Sort sort = switch (request.getSorting()) {
             case "ascending" -> Sort.by(new Sort.Order(Sort.Direction.ASC, "title").ignoreCase());
             case "descending" -> Sort.by(new Sort.Order(Sort.Direction.DESC, "title").ignoreCase());
-            default -> Sort.by(Sort.Direction.DESC, "createdAt");
+            default -> Sort.by(Sort.Direction.ASC, "orderNo").and(Sort.by(Sort.Direction.DESC, "createdAt"));
         };
         int pageIndex = Math.max(request.getPageIndex() - 1, 0);
         Pageable pageable = PageRequest.of(pageIndex, request.getPageSize(), sort);
@@ -81,10 +81,23 @@ public class TaskService {
         return TaskMapper.toUpdateResponse(taskRepository.save(task));
     }
 
-    public UpdateTaskColumnResponse updateColumn(UUID id, UUID columnId) {
+    public UpdateTaskColumnResponse move(UUID id, UUID columnId, int targetIndex) {
         Task task = taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
-        task.setColumn(findColumn(columnId));
-        return TaskMapper.toUpdateColumnResponse(taskRepository.save(task));
+        BoardColumn destColumn = findColumn(columnId);
+
+        List<Task> destTasks = taskRepository.findByColumn_IdOrderByOrderNoAscCreatedAtDesc(columnId);
+        destTasks.removeIf(t -> t.getId().equals(id));
+
+        int index = Math.max(0, Math.min(targetIndex, destTasks.size()));
+        destTasks.add(index, task);
+        task.setColumn(destColumn);
+
+        for (int i = 0; i < destTasks.size(); i++) {
+            destTasks.get(i).setOrderNo(i);
+        }
+        taskRepository.saveAll(destTasks);
+
+        return TaskMapper.toUpdateColumnResponse(task);
     }
 
     private BoardColumn findColumn(UUID columnId) {

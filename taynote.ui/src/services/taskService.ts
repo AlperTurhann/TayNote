@@ -111,20 +111,19 @@ const updateTaskAsync = createAsyncThunk<TryCatchResult<UpdateTask>, UpdateTask,
   }
 );
 
-const updateTaskColumnAsync = createAsyncThunk<TryCatchResult<UpdateTask>, MoveTask, ThunkConfig>(
-  'tasks/updateTaskColumnAsync',
-  async ({ id, columnId, sourceColumnId }, thunkAPI) => {
+const moveTaskAsync = createAsyncThunk<TryCatchResult<UpdateTask>, MoveTask, ThunkConfig>(
+  'tasks/moveTaskAsync',
+  async ({ id, columnId, sourceColumnId, targetIndex }, thunkAPI) => {
     const result = await tryCatch<UpdateTask>(
       axios
-        .patch<UpdateTask>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/tasks/${id}/update-column`, {
-          columnId
+        .patch<UpdateTask>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/tasks/${id}/move`, {
+          columnId,
+          targetIndex
         })
         .then((res) => res.data)
     );
-    if (!result.error) {
-      refetchColumn(thunkAPI, sourceColumnId);
-      refetchColumn(thunkAPI, columnId);
-    }
+    refetchColumn(thunkAPI, sourceColumnId);
+    if (sourceColumnId !== columnId) refetchColumn(thunkAPI, columnId);
     return result;
   }
 );
@@ -148,7 +147,7 @@ export {
   getTasksAsync,
   addTaskAsync,
   updateTaskAsync,
-  updateTaskColumnAsync,
+  moveTaskAsync,
   deleteTaskAsync,
   searchAllColumnsAsync,
   resetAllFiltersAsync

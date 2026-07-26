@@ -26,6 +26,7 @@ interface MoveTask {
   id: string;
   columnId: string;
   sourceColumnId: string;
+  targetIndex: number;
 }
 
 interface DeleteTask {

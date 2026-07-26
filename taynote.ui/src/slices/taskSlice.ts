@@ -1,11 +1,11 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { EMPTY_COLUMN_TASKS_STATE } from '@/constants/generalConstants';
 import { ColumnTasksState, TaskState } from '@/models/Task';
 import {
   addTaskAsync,
   updateTaskAsync,
-  updateTaskColumnAsync,
+  moveTaskAsync,
   deleteTaskAsync,
   getTasksAsync,
   resetAllFiltersAsync,
@@ -30,10 +30,33 @@ const initialState: TaskState = {
   }
 };
 
+interface TaskMovedLocallyPayload {
+  taskId: string;
+  sourceColumnId: string;
+  destColumnId: string;
+  targetIndex: number;
+}
+
 const taskSlice = createSlice({
   name: 'task',
   initialState,
-  reducers: {},
+  reducers: {
+    taskMovedLocally: (state, action: PayloadAction<TaskMovedLocallyPayload>) => {
+      const { taskId, sourceColumnId, destColumnId, targetIndex } = action.payload;
+      const sourceState = state.byColumn[sourceColumnId];
+      if (!sourceState) return;
+
+      const taskIndex = sourceState.tasks.findIndex((task) => task.id === taskId);
+      if (taskIndex === -1) return;
+
+      const [task] = sourceState.tasks.splice(taskIndex, 1);
+      task.columnId = destColumnId;
+
+      const destState = getOrCreateColumnState(state, destColumnId);
+      const index = Math.max(0, Math.min(targetIndex, destState.tasks.length));
+      destState.tasks.splice(index, 0, task);
+    }
+  },
   extraReducers: (builder) => {
     //#region Get Tasks
     builder
@@ -95,14 +118,16 @@ const taskSlice = createSlice({
         if (task) task.isUpdating = false;
       });
     //#endregion
-    //#region Update Task Column
+    //#region Move Task
     builder
-      .addCase(updateTaskColumnAsync.pending, (state, action) => {
-        const task = findTask(state, action.meta.arg.sourceColumnId, action.meta.arg.id);
+      .addCase(moveTaskAsync.pending, (state, action) => {
+        const { id, sourceColumnId, columnId } = action.meta.arg;
+        const task = findTask(state, columnId, id) ?? findTask(state, sourceColumnId, id);
         if (task) task.isUpdating = true;
       })
-      .addCase(updateTaskColumnAsync.fulfilled, (state, action) => {
-        const task = findTask(state, action.meta.arg.sourceColumnId, action.meta.arg.id);
+      .addCase(moveTaskAsync.fulfilled, (state, action) => {
+        const { id, sourceColumnId, columnId } = action.meta.arg;
+        const task = findTask(state, columnId, id) ?? findTask(state, sourceColumnId, id);
         if (task) task.isUpdating = false;
       });
     //#endregion
@@ -120,6 +145,7 @@ const taskSlice = createSlice({
   }
 });
 
+export const { taskMovedLocally } = taskSlice.actions;
 export const selectColumnTasks = (columnId: string) => (state: { task: TaskState }) =>
   state.task.byColumn[columnId] ?? EMPTY_COLUMN_TASKS_STATE;
 export const selectGlobalQuery = (state: { task: TaskState }) => state.task.globalQuery;

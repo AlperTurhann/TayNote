@@ -11,7 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { VerificationRequiredButton } from '@/components/VerificationRequiredButton';
 import { useAppDispatch } from '@/lib/hooks';
 import { cn } from '@/lib/utils';
-import { TaskWithStatus } from '@/models/Task';
+import { Task, TaskWithStatus } from '@/models/Task';
 import { TaskFormData, TaskFormSchema } from '@/schemas/TaskSchema';
 import { addTaskAsync, deleteTaskAsync, updateTaskAsync } from '@/services/taskService';
 
@@ -42,6 +42,26 @@ const TaskCardSkeleton = () => {
       <div className="flex justify-end">
         <Skeleton className="size-6 rounded-full bg-base-600" />
       </div>
+    </div>
+  );
+};
+
+const TaskDropPlaceholder = () => {
+  return (
+    <div className="w-full h-14 shrink-0 rounded-l-lg border-2 border-dashed border-indigo-500/50" />
+  );
+};
+
+const TaskDragOverlay = (task: Task) => {
+  return (
+    <div
+      className={cn(
+        'w-full relative flex flex-col transition-colors duration-200 p-2 gap-y-2 border-l-4',
+        task.completed ? 'bg-base-950' : 'bg-base-700'
+      )}
+      style={{ borderLeftColor: task.color }}
+    >
+      <p>{task.title}</p>
     </div>
   );
 };
@@ -242,4 +262,11 @@ const TaskCard = ({ task }: TaskCardProps) => {
   );
 };
 
-export { NewTaskPlaceholder, TaskCardSkeleton, NewTaskCard, TaskCard };
+export {
+  NewTaskPlaceholder,
+  TaskCardSkeleton,
+  TaskDropPlaceholder,
+  TaskDragOverlay,
+  NewTaskCard,
+  TaskCard
+};

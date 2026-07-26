@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.taynote.api.dto.column.ColumnDto;
 import com.taynote.api.dto.column.request.CreateColumnRequest;
+import com.taynote.api.dto.column.request.MoveColumnRequest;
 import com.taynote.api.dto.column.request.UpdateColumnRequest;
 import com.taynote.api.dto.column.response.CreateColumnResponse;
 import com.taynote.api.dto.column.response.UpdateColumnResponse;
@@ -47,6 +48,11 @@ public class ColumnController {
     @PatchMapping("/{id}")
     public UpdateColumnResponse update(@PathVariable UUID id, @RequestBody UpdateColumnRequest request) {
         return columnService.update(id, request);
+    }
+
+    @PatchMapping("/{id}/move")
+    public UpdateColumnResponse move(@PathVariable UUID id, @RequestBody MoveColumnRequest request) {
+        return columnService.move(id, request.getTargetIndex());
     }
 
     @DeleteMapping(value = "/{id}")

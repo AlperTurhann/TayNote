@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-import { Column, CreateColumn, DeleteColumn, UpdateColumn } from '@/models/Column';
+import { Column, CreateColumn, DeleteColumn, MoveColumn, UpdateColumn } from '@/models/Column';
 import { ThunkConfig } from '@/models/FetchOperations';
 import { tryCatch, TryCatchResult } from '@/utils/tryCatch';
 
@@ -39,6 +39,21 @@ const updateColumnAsync = createAsyncThunk(
   }
 );
 
+const moveColumnAsync = createAsyncThunk<TryCatchResult<Column>, MoveColumn, ThunkConfig>(
+  'columns/moveColumnAsync',
+  async ({ id, boardId, targetIndex }, { dispatch }) => {
+    const result = await tryCatch<Column>(
+      axios
+        .patch<Column>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/columns/${id}/move`, {
+          targetIndex
+        })
+        .then((res) => res.data)
+    );
+    dispatch(getColumnsAsync(boardId));
+    return result;
+  }
+);
+
 const deleteColumnAsync = createAsyncThunk<TryCatchResult<void>, DeleteColumn, ThunkConfig>(
   'columns/deleteColumnAsync',
   async ({ columnId, boardId }, { dispatch }) => {
@@ -54,4 +69,4 @@ const deleteColumnAsync = createAsyncThunk<TryCatchResult<void>, DeleteColumn, T
   }
 );
 
-export { getColumnsAsync, addColumnAsync, updateColumnAsync, deleteColumnAsync };
+export { getColumnsAsync, addColumnAsync, updateColumnAsync, moveColumnAsync, deleteColumnAsync };

@@ -2,7 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 import type { AppDispatch } from '@/lib/store';
-import { Board, CreateBoard } from '@/models/Board';
+import { Board, CreateBoard, MoveBoard } from '@/models/Board';
 import { tryCatch, TryCatchResult } from '@/utils/tryCatch';
 
 type ThunkConfig = { dispatch: AppDispatch };
@@ -48,6 +48,21 @@ const updateBoardAsync = createAsyncThunk<TryCatchResult<Board>, Board, ThunkCon
   }
 );
 
+const moveBoardAsync = createAsyncThunk<TryCatchResult<Board>, MoveBoard, ThunkConfig>(
+  'boards/moveBoardAsync',
+  async ({ id, targetIndex }, { dispatch }) => {
+    const result = await tryCatch<Board>(
+      axios
+        .patch<Board>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/boards/${id}/move`, {
+          targetIndex
+        })
+        .then((res) => res.data)
+    );
+    dispatch(getBoardsAsync());
+    return result;
+  }
+);
+
 const deleteBoardAsync = createAsyncThunk<TryCatchResult<void>, string, ThunkConfig>(
   'boards/deleteBoardAsync',
   async (boardId, { dispatch }) => {
@@ -63,4 +78,4 @@ const deleteBoardAsync = createAsyncThunk<TryCatchResult<void>, string, ThunkCon
   }
 );
 
-export { getBoardsAsync, addBoardAsync, updateBoardAsync, deleteBoardAsync };
+export { getBoardsAsync, addBoardAsync, updateBoardAsync, moveBoardAsync, deleteBoardAsync };

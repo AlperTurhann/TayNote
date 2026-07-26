@@ -20,6 +20,9 @@ public class Board {
     @Column(nullable = false, unique = true)
     private String name;
 
+    @Column(name = "order_no", nullable = false, columnDefinition = "integer not null default 0")
+    private int orderNo;
+
     public UUID getId() {
         return id;
     }
@@ -34,5 +37,13 @@ public class Board {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getOrderNo() {
+        return orderNo;
+    }
+
+    public void setOrderNo(int orderNo) {
+        this.orderNo = orderNo;
     }
 }

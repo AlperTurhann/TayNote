@@ -33,13 +33,21 @@ public class BoardService {
         this.taskRepository = taskRepository;
     }
 
+    private int nextOrderNo() {
+        return boardRepository.findAllByOrderByOrderNoAsc().stream()
+                .mapToInt(Board::getOrderNo)
+                .max()
+                .orElse(-1) + 1;
+    }
+
     public List<Board> findAll() {
-        return boardRepository.findAll();
+        return boardRepository.findAllByOrderByOrderNoAsc();
     }
 
     public CreateBoardResponse create(CreateBoardRequest request) {
         Board board = new Board();
         board.setName(request.getName());
+        board.setOrderNo(nextOrderNo());
         return BoardMapper.toCreateResponse(boardRepository.save(board));
     }
 
@@ -52,6 +60,23 @@ public class BoardService {
             board.setName(request.getName());
         }
         return BoardMapper.toUpdateResponse(boardRepository.save(board));
+    }
+
+    public UpdateBoardResponse move(UUID id, int targetIndex) {
+        Board board = boardRepository.findById(id).orElseThrow(() -> new BoardNotFoundException(id));
+
+        List<Board> boards = boardRepository.findAllByOrderByOrderNoAsc();
+        boards.removeIf(b -> b.getId().equals(id));
+
+        int index = Math.max(0, Math.min(targetIndex, boards.size()));
+        boards.add(index, board);
+
+        for (int i = 0; i < boards.size(); i++) {
+            boards.get(i).setOrderNo(i);
+        }
+        boardRepository.saveAll(boards);
+
+        return BoardMapper.toUpdateResponse(board);
     }
 
     @Transactional

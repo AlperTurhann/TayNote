@@ -51,10 +51,24 @@ public class ColumnService {
         if (request.getName() != null) {
             column.setName(request.getName());
         }
-        if (request.getOrderNo() != null) {
-            column.setOrderNo(request.getOrderNo());
-        }
         return ColumnMapper.toUpdateResponse(columnRepository.save(column));
+    }
+
+    public UpdateColumnResponse move(UUID id, int targetIndex) {
+        BoardColumn column = columnRepository.findById(id).orElseThrow(() -> new ColumnNotFoundException(id));
+
+        List<BoardColumn> columns = columnRepository.findByBoard_IdOrderByOrderNoAsc(column.getBoard().getId());
+        columns.removeIf(c -> c.getId().equals(id));
+
+        int index = Math.max(0, Math.min(targetIndex, columns.size()));
+        columns.add(index, column);
+
+        for (int i = 0; i < columns.size(); i++) {
+            columns.get(i).setOrderNo(i);
+        }
+        columnRepository.saveAll(columns);
+
+        return ColumnMapper.toUpdateResponse(column);
     }
 
     public void delete(UUID id) {

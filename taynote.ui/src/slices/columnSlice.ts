@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { ColumnWithStatus } from '@/models/Column';
 import { FetchOperations } from '@/models/FetchOperations';
@@ -6,6 +6,7 @@ import {
   addColumnAsync,
   deleteColumnAsync,
   getColumnsAsync,
+  moveColumnAsync,
   updateColumnAsync
 } from '@/services/columnService';
 
@@ -31,7 +32,14 @@ const findColumn = (state: ColumnState, columnId: string) =>
 const columnSlice = createSlice({
   name: 'column',
   initialState,
-  reducers: {},
+  reducers: {
+    columnsReordered: (state, action: PayloadAction<string[]>) => {
+      const byId = new Map(state.columns.map((column) => [column.id, column]));
+      state.columns = action.payload
+        .map((id) => byId.get(id))
+        .filter((column): column is ColumnWithStatus => column !== undefined);
+    }
+  },
   extraReducers: (builder) => {
     //#region Get Columns
     builder
@@ -78,6 +86,17 @@ const columnSlice = createSlice({
         }
       });
     //#endregion
+    //#region Move Column
+    builder
+      .addCase(moveColumnAsync.pending, (state, action) => {
+        const column = findColumn(state, action.meta.arg.id);
+        if (column) column.isUpdating = true;
+      })
+      .addCase(moveColumnAsync.fulfilled, (state, action) => {
+        const column = findColumn(state, action.meta.arg.id);
+        if (column) column.isUpdating = false;
+      });
+    //#endregion
     //#region Delete Column
     builder
       .addCase(deleteColumnAsync.pending, (state, action) => {
@@ -92,6 +111,7 @@ const columnSlice = createSlice({
   }
 });
 
+export const { columnsReordered } = columnSlice.actions;
 export const selectColumns = (state: { column: ColumnState }) => state.column.columns;
 export const selectGetColumnsIsLoading = (state: { column: ColumnState }) =>
   state.column.getColumns.isLoading;

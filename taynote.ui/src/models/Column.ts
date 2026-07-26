@@ -13,14 +13,20 @@ interface ColumnWithStatus extends Column {
   isDeleting: boolean;
 }
 
-type UpdateColumn = { id: string } & (
-  | { name: string; orderNo?: number }
-  | { name?: string; orderNo: number }
-);
+interface UpdateColumn {
+  id: string;
+  name: string;
+}
+
+interface MoveColumn {
+  id: string;
+  boardId: string;
+  targetIndex: number;
+}
 
 interface DeleteColumn {
   columnId: string;
   boardId: string;
 }
 
-export type { CreateColumn, Column, ColumnWithStatus, UpdateColumn, DeleteColumn };
+export type { CreateColumn, Column, ColumnWithStatus, UpdateColumn, MoveColumn, DeleteColumn };

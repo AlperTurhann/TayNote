@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { BoardWithStatus } from '@/models/Board';
 import { FetchOperations } from '@/models/FetchOperations';
@@ -6,7 +6,8 @@ import {
   addBoardAsync,
   updateBoardAsync,
   deleteBoardAsync,
-  getBoardsAsync
+  getBoardsAsync,
+  moveBoardAsync
 } from '@/services/boardService';
 
 interface BoardState {
@@ -31,7 +32,14 @@ const findBoard = (state: BoardState, boardId: string) =>
 const boardSlice = createSlice({
   name: 'board',
   initialState,
-  reducers: {},
+  reducers: {
+    boardsReordered: (state, action: PayloadAction<string[]>) => {
+      const byId = new Map(state.boards.map((board) => [board.id, board]));
+      state.boards = action.payload
+        .map((id) => byId.get(id))
+        .filter((board): board is BoardWithStatus => board !== undefined);
+    }
+  },
   extraReducers: (builder) => {
     //#region Get Boards
     builder
@@ -69,6 +77,17 @@ const boardSlice = createSlice({
         if (board) board.isUpdating = false;
       });
     //#endregion
+    //#region Move Board
+    builder
+      .addCase(moveBoardAsync.pending, (state, action) => {
+        const board = findBoard(state, action.meta.arg.id);
+        if (board) board.isUpdating = true;
+      })
+      .addCase(moveBoardAsync.fulfilled, (state, action) => {
+        const board = findBoard(state, action.meta.arg.id);
+        if (board) board.isUpdating = false;
+      });
+    //#endregion
     //#region Delete Board
     builder
       .addCase(deleteBoardAsync.pending, (state, action) => {
@@ -83,6 +102,7 @@ const boardSlice = createSlice({
   }
 });
 
+export const { boardsReordered } = boardSlice.actions;
 export const selectBoards = (state: { board: BoardState }) => state.board.boards;
 export const selectBoardIsCreating = (state: { board: BoardState }) =>
   state.board.addBoard.isLoading;
