@@ -253,7 +253,7 @@ const Column = ({ column, placeholderIndex = null, taskCrossedColumn = false }: 
   };
 
   return (
-    <section className="w-64 flex flex-col overflow-y-hidden shrink-0 rounded-b-md bg-base-800">
+    <section className="w-64 flex-1 flex flex-col overflow-y-hidden shrink-0 rounded-b-md bg-base-800">
       <ColumnHeader
         column={column}
         setAddTaskIsHovered={setAddTaskIsHovered}

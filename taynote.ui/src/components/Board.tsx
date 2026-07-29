@@ -181,7 +181,7 @@ const Board = ({ boardId }: BoardProps) => {
         onDragEnd={handleDragEnd}
         onDragCancel={handleDragCancel}
       >
-        <ScrollArea className="flex-1" viewportClassName="[&>div]:h-full">
+        <ScrollArea className="flex-1 min-h-0" viewportClassName="[&>div]:h-full [&>div]:block!">
           <div className="size-full flex p-2 pb-4 gap-x-4">
             {isLoading && columns.length === 0 ? (
               SKELETON_KEYS.map((key) => <ColumnSkeleton key={key} />)
