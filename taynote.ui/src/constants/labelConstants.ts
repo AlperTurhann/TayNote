@@ -1,0 +1,3 @@
+const DEFAULT_LABEL_COLOR = '#6b7280';
+
+export { DEFAULT_LABEL_COLOR };

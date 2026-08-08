@@ -1,11 +1,13 @@
 'use client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Pencil } from 'lucide-react';
+import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { Button } from '@/components/base/Button';
 import Input from '@/components/base/Input';
+import { LabelBadge, LabelToggleList } from '@/components/Label';
 import {
   Dialog,
   DialogContent,
@@ -14,11 +16,14 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { TASK_DESCRIPTION_MAX_LENGTH } from '@/constants/taskConstants';
-import { useAppDispatch } from '@/lib/hooks';
+import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { Task } from '@/models/Task';
 import { TaskDetailFormData, TaskDetailFormSchema } from '@/schemas/TaskSchema';
+import { getBoardLabelsAsync, getGlobalLabelsAsync } from '@/services/labelService';
 import { updateTaskAsync } from '@/services/taskService';
+import { selectBoardLabels, selectGlobalLabels } from '@/slices/labelSlice';
 
 interface TaskDetailDialogProps {
   task: Task;
@@ -27,9 +32,17 @@ interface TaskDetailDialogProps {
 
 const TaskDetailDialog = ({ task, button }: TaskDetailDialogProps) => {
   const dispatch = useAppDispatch();
+  const { boardId } = useParams<{ boardId?: string }>();
+  const globalLabels = useAppSelector(selectGlobalLabels);
+  const boardLabels = useAppSelector(selectBoardLabels);
+  const availableLabels = [...globalLabels, ...boardLabels];
+
   const [open, setOpen] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [selectedLabelIds, setSelectedLabelIds] = useState<string[]>(
+    task.labels.map((label) => label.id)
+  );
 
   const {
     register,
@@ -47,13 +60,28 @@ const TaskDetailDialog = ({ task, button }: TaskDetailDialogProps) => {
     if (open) {
       setIsEditing(false);
       reset({ title: task.title, color: task.color, description: task.description ?? '' });
+      setSelectedLabelIds(task.labels.map((label) => label.id));
     }
-  }, [open, task.title, task.color, task.description, reset]);
+  }, [open, task.title, task.color, task.description, task.labels, reset]);
+
+  useEffect(() => {
+    if (open) {
+      dispatch(getGlobalLabelsAsync());
+      if (boardId) dispatch(getBoardLabelsAsync(boardId));
+    }
+  }, [open, boardId, dispatch]);
 
   const startEditing = () => setIsEditing(true);
 
+  const toggleLabel = (labelId: string) => {
+    setSelectedLabelIds((current) =>
+      current.includes(labelId) ? current.filter((id) => id !== labelId) : [...current, labelId]
+    );
+  };
+
   const cancelEditing = () => {
     reset({ title: task.title, color: task.color, description: task.description ?? '' });
+    setSelectedLabelIds(task.labels.map((label) => label.id));
     setIsEditing(false);
   };
 
@@ -64,7 +92,8 @@ const TaskDetailDialog = ({ task, button }: TaskDetailDialogProps) => {
         ...task,
         title: data.title.trim(),
         color: data.color,
-        description: data.description?.trim() ?? ''
+        description: data.description?.trim() ?? '',
+        labelIds: selectedLabelIds
       })
     );
     setIsSaving(false);
@@ -119,6 +148,15 @@ const TaskDetailDialog = ({ task, button }: TaskDetailDialogProps) => {
               placeholder="Add a more detailed description..."
               maxLength={TASK_DESCRIPTION_MAX_LENGTH}
             />
+            <div className="flex flex-col gap-y-1">
+              <p className="font-medium">Labels</p>
+              <LabelToggleList
+                labels={availableLabels}
+                selectedLabelIds={selectedLabelIds}
+                onToggle={toggleLabel}
+                emptyMessage="No labels yet. Create one from the labels panel."
+              />
+            </div>
             <DialogFooter>
               <Button
                 colorVariant="base"
@@ -153,6 +191,20 @@ const TaskDetailDialog = ({ task, button }: TaskDetailDialogProps) => {
                 <p className="whitespace-pre-wrap">{task.description}</p>
               ) : (
                 <p className="text-base-400 italic">No description</p>
+              )}
+            </div>
+            <div className="flex flex-col gap-y-1">
+              <p className="text-sm font-medium text-base-400">Labels</p>
+              {task.labels.length > 0 ? (
+                <ScrollArea className="max-h-24 w-[calc(100%+8px)] -ml-2" viewportClassName="pl-2">
+                  <div className="flex flex-wrap gap-1 pr-2">
+                    {task.labels.map((label) => (
+                      <LabelBadge key={label.id} label={label} />
+                    ))}
+                  </div>
+                </ScrollArea>
+              ) : (
+                <p className="text-base-400 italic">No labels</p>
               )}
             </div>
           </div>

@@ -12,6 +12,7 @@ import com.taynote.api.exception.board.BoardAlreadyExistsException;
 import com.taynote.api.exception.board.BoardNotFoundException;
 import com.taynote.api.exception.column.ColumnNotEmptyException;
 import com.taynote.api.exception.column.ColumnNotFoundException;
+import com.taynote.api.exception.label.LabelNotFoundException;
 import com.taynote.api.exception.task.TaskNotFoundException;
 
 @RestControllerAdvice
@@ -56,6 +57,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleBoardAlreadyExists(BoardAlreadyExistsException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
                 STATUS, HttpStatus.CONFLICT.value(),
+                MESSAGE, ex.getMessage(),
+                TIMESTAMP, Instant.now().toString()));
+    }
+
+    @ExceptionHandler(LabelNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleLabelNotFound(LabelNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                STATUS, HttpStatus.NOT_FOUND.value(),
                 MESSAGE, ex.getMessage(),
                 TIMESTAMP, Instant.now().toString()));
     }

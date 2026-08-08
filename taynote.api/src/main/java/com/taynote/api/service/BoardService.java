@@ -15,6 +15,7 @@ import com.taynote.api.exception.board.BoardNotFoundException;
 import com.taynote.api.mapper.BoardMapper;
 import com.taynote.api.repository.BoardRepository;
 import com.taynote.api.repository.ColumnRepository;
+import com.taynote.api.repository.LabelRepository;
 import com.taynote.api.repository.TaskRepository;
 
 import jakarta.transaction.Transactional;
@@ -25,12 +26,14 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final ColumnRepository columnRepository;
     private final TaskRepository taskRepository;
+    private final LabelRepository labelRepository;
 
     public BoardService(BoardRepository boardRepository, ColumnRepository columnRepository,
-            TaskRepository taskRepository) {
+            TaskRepository taskRepository, LabelRepository labelRepository) {
         this.boardRepository = boardRepository;
         this.columnRepository = columnRepository;
         this.taskRepository = taskRepository;
+        this.labelRepository = labelRepository;
     }
 
     private int nextOrderNo() {
@@ -87,6 +90,7 @@ public class BoardService {
 
         taskRepository.deleteByColumn_Board_Id(id);
         columnRepository.deleteByBoard_Id(id);
+        labelRepository.deleteByBoard_Id(id);
         boardRepository.deleteById(id);
     }
 }

@@ -28,7 +28,12 @@ import { ColumnFormData, ColumnFormSchema } from '@/schemas/ColumnSchema';
 import { deleteColumnAsync, updateColumnAsync } from '@/services/columnService';
 import { getTasksAsync } from '@/services/taskService';
 import { selectColumnTasks } from '@/slices/taskSlice';
-import { parseFilters, parseGlobalQuery, withColumnFilter } from '@/utils/boardSearchParams';
+import {
+  parseFilters,
+  parseGlobalLabelIds,
+  parseGlobalQuery,
+  withColumnFilter
+} from '@/utils/boardSearchParams';
 
 interface ColumnHeaderProps {
   column: ColumnWithStatus;
@@ -224,12 +229,14 @@ const Column = ({ column, placeholderIndex = null, taskCrossedColumn = false }: 
   useEffect(() => {
     const columnFilter = parseFilters(searchParams)[column.id];
     const globalQuery = parseGlobalQuery(searchParams);
-    const isGlobalSearch = !columnFilter && globalQuery !== '';
+    const globalLabelIds = parseGlobalLabelIds(searchParams);
+    const isGlobalSearch = !columnFilter && (globalQuery !== '' || globalLabelIds.length > 0);
     dispatch(
       getTasksAsync({
         ...DEFAULT_TABLE_OPERATIONS,
         sorting: columnFilter?.sorting ?? DEFAULT_TABLE_OPERATIONS.sorting,
         query: columnFilter?.query ?? globalQuery,
+        labelIds: columnFilter ? [] : globalLabelIds,
         columnId: column.id,
         isGlobalSearch
       })

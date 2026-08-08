@@ -29,7 +29,7 @@ const Header = () => {
           {isRightPanelOpen ? <PanelRightClose /> : <PanelRightOpen />}
         </Button>
       </div>
-      <RightPanel isOpen={isRightPanelOpen} setIsOpen={setIsRightPanelOpen} />
+      <RightPanel isOpen={isRightPanelOpen} />
     </header>
   );
 };

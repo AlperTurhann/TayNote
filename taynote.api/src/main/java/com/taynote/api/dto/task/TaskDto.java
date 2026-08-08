@@ -1,6 +1,9 @@
 package com.taynote.api.dto.task;
 
+import java.util.List;
 import java.util.UUID;
+
+import com.taynote.api.dto.label.LabelDto;
 
 public class TaskDto {
 
@@ -10,14 +13,17 @@ public class TaskDto {
     private String description;
     private boolean completed;
     private UUID columnId;
+    private List<LabelDto> labels;
 
-    public TaskDto(UUID id, String title, String color, String description, boolean completed, UUID columnId) {
+    public TaskDto(UUID id, String title, String color, String description, boolean completed, UUID columnId,
+            List<LabelDto> labels) {
         this.id = id;
         this.title = title;
         this.color = color;
         this.description = description;
         this.completed = completed;
         this.columnId = columnId;
+        this.labels = labels;
     }
 
     public UUID getId() {
@@ -42,5 +48,9 @@ public class TaskDto {
 
     public UUID getColumnId() {
         return columnId;
+    }
+
+    public List<LabelDto> getLabels() {
+        return labels;
     }
 }

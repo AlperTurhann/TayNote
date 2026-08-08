@@ -5,6 +5,7 @@ interface TableOpertions {
   pageIndex: number;
   pageSize: number;
   query: string;
+  labelIds: string[];
   columnId?: string;
 }
 

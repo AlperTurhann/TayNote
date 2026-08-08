@@ -17,6 +17,7 @@ import { useEffect, useState } from 'react';
 import { ClearFiltersButton } from '@/components/ClearFiltersButton';
 import { ColumnDragOverlay, ColumnSkeleton } from '@/components/Column';
 import { SortableColumn } from '@/components/dnd/SortableColumn';
+import { LabelFilterBar } from '@/components/Label';
 import { NewColumnForm } from '@/components/NewColumnForm';
 import { TaskSearchBar } from '@/components/SearchBar';
 import { TaskDragOverlay } from '@/components/TaskCard';
@@ -171,6 +172,7 @@ const Board = ({ boardId }: BoardProps) => {
     <>
       <div className="flex items-center px-2 gap-x-2">
         <TaskSearchBar />
+        <LabelFilterBar boardId={boardId} />
         <ClearFiltersButton />
       </div>
       <DndContext

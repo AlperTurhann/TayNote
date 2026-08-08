@@ -9,7 +9,7 @@ import {
   deleteTaskAsync,
   getTasksAsync,
   resetAllFiltersAsync,
-  searchAllColumnsAsync
+  applyGlobalFiltersAsync
 } from '@/services/taskService';
 
 const getOrCreateColumnState = (state: TaskState, columnId: string): ColumnTasksState => {
@@ -25,6 +25,7 @@ const findTask = (state: TaskState, columnId: string, taskId: string) =>
 const initialState: TaskState = {
   byColumn: {},
   globalQuery: '',
+  globalLabelIds: [],
   addTask: {
     isLoading: false
   }
@@ -87,14 +88,16 @@ const taskSlice = createSlice({
         columnState.error = action.payload.error ?? undefined;
       });
     //#endregion
-    //#region Search All Columns
-    builder.addCase(searchAllColumnsAsync.pending, (state, action) => {
-      state.globalQuery = action.meta.arg;
+    //#region Apply Global Filters
+    builder.addCase(applyGlobalFiltersAsync.pending, (state, action) => {
+      if (action.meta.arg.query !== undefined) state.globalQuery = action.meta.arg.query;
+      if (action.meta.arg.labelIds !== undefined) state.globalLabelIds = action.meta.arg.labelIds;
     });
     //#endregion
     //#region Reset All Filters
     builder.addCase(resetAllFiltersAsync.pending, (state) => {
       state.globalQuery = '';
+      state.globalLabelIds = [];
     });
     //#endregion
     //#region Add Task
@@ -149,5 +152,6 @@ export const { taskMovedLocally } = taskSlice.actions;
 export const selectColumnTasks = (columnId: string) => (state: { task: TaskState }) =>
   state.task.byColumn[columnId] ?? EMPTY_COLUMN_TASKS_STATE;
 export const selectGlobalQuery = (state: { task: TaskState }) => state.task.globalQuery;
+export const selectGlobalLabelIds = (state: { task: TaskState }) => state.task.globalLabelIds;
 
 export default taskSlice.reducer;

@@ -1,5 +1,6 @@
 package com.taynote.api.dto.task.request;
 
+import java.util.List;
 import java.util.UUID;
 
 public class CreateTaskRequest {
@@ -8,6 +9,7 @@ public class CreateTaskRequest {
     private String color;
     private String description;
     private UUID columnId;
+    private List<UUID> labelIds;
 
     public String getTitle() {
         return title;
@@ -39,5 +41,13 @@ public class CreateTaskRequest {
 
     public void setColumnId(UUID columnId) {
         this.columnId = columnId;
+    }
+
+    public List<UUID> getLabelIds() {
+        return labelIds;
+    }
+
+    public void setLabelIds(List<UUID> labelIds) {
+        this.labelIds = labelIds;
     }
 }

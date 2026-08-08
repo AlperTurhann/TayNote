@@ -5,7 +5,8 @@ const DEFAULT_TABLE_OPERATIONS: TableOpertions = {
   sorting: 'none',
   pageIndex: 1,
   pageSize: 10,
-  query: ''
+  query: '',
+  labelIds: []
 };
 
 const EMPTY_COLUMN_TASKS_STATE: ColumnTasksState = {

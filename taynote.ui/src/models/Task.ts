@@ -1,4 +1,5 @@
 import { FetchOperations } from '@/models/FetchOperations';
+import { Label } from '@/models/Label';
 import { TableOpertions } from '@/models/TableOperations';
 
 interface CreateTask {
@@ -11,6 +12,7 @@ interface Task extends CreateTask {
   id: string;
   completed: boolean;
   description?: string | null;
+  labels: Label[];
 }
 
 interface TaskWithStatus extends Task {
@@ -21,6 +23,7 @@ interface TaskWithStatus extends Task {
 interface UpdateTask extends Partial<Task> {
   id: string;
   columnId: string;
+  labelIds?: string[];
 }
 
 interface MoveTask {
@@ -51,6 +54,7 @@ interface ColumnTasksState {
 interface TaskState {
   byColumn: Record<string, ColumnTasksState>;
   globalQuery: string;
+  globalLabelIds: string[];
   addTask: FetchOperations;
 }
 

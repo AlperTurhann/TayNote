@@ -20,6 +20,7 @@ import Input from '@/components/base/Input';
 import { LinkButton } from '@/components/base/LinkButton';
 import { LoadingSpinner } from '@/components/base/LoadingSpinner';
 import { SortableBoard } from '@/components/dnd/SortableBoard';
+import { LabelChip, NewLabelForm } from '@/components/Label';
 import { NewBoardForm } from '@/components/NewBoardForm';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -35,7 +36,9 @@ import {
   deleteBoardAsync,
   getBoardsAsync
 } from '@/services/boardService';
+import { getGlobalLabelsAsync } from '@/services/labelService';
 import { boardsReordered, selectBoards, selectGetBoardsIsLoading } from '@/slices/boardSlice';
+import { selectGetGlobalLabelsIsLoading, selectGlobalLabels } from '@/slices/labelSlice';
 
 interface BoardButtonProps {
   board: BoardWithStatus;
@@ -168,12 +171,18 @@ const BoardList = () => {
   const dispatch = useAppDispatch();
   const boards = useAppSelector(selectBoards);
   const isLoading = useAppSelector(selectGetBoardsIsLoading);
+  const globalLabels = useAppSelector(selectGlobalLabels);
+  const isGlobalLabelsLoading = useAppSelector(selectGetGlobalLabelsIsLoading);
   const [activeLabel, setActiveLabel] = useState<string | null>(null);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
 
   useEffect(() => {
     dispatch(getBoardsAsync());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(getGlobalLabelsAsync());
   }, [dispatch]);
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -196,33 +205,48 @@ const BoardList = () => {
   const handleDragCancel = () => setActiveLabel(null);
 
   return (
-    <section className="flex flex-col gap-y-2">
-      <NewBoardForm />
-      <ScrollArea className="w-[calc(100%+8px)] min-h-0 flex-1 -ml-2" viewportClassName="pl-2">
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-          onDragCancel={handleDragCancel}
-        >
-          <div className="flex flex-col pt-1 gap-y-2">
-            {isLoading && boards.length === 0 ? (
-              SKELETON_KEYS.map((key) => <BoardSkeleton key={key} />)
+    <section className="container min-h-0 flex-1 grid grid-cols-2 gap-px bg-white">
+      <div className="flex flex-col min-h-0 p-6 gap-y-2 bg-base-900">
+        <NewBoardForm />
+        <ScrollArea className="w-[calc(100%+8px)] min-h-0 -ml-2" viewportClassName="pl-2">
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+            onDragCancel={handleDragCancel}
+          >
+            <div className="flex flex-col gap-y-2">
+              {isLoading && boards.length === 0 ? (
+                SKELETON_KEYS.map((key) => <BoardSkeleton key={key} />)
+              ) : (
+                <SortableContext
+                  items={boards.map((board) => board.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {boards.map((board) => (
+                    <SortableBoard key={board.id} board={board} />
+                  ))}
+                </SortableContext>
+              )}
+            </div>
+            <DragOverlay>{activeLabel && <BoardDragOverlay name={activeLabel} />}</DragOverlay>
+          </DndContext>
+        </ScrollArea>
+      </div>
+      <div className="flex min-h-0 flex-col gap-y-2 p-6 bg-base-900">
+        <h2 className="font-bold text-base-100">Global Labels</h2>
+        <NewLabelForm />
+        <ScrollArea className="w-[calc(100%+8px)] min-h-0 -ml-2" viewportClassName="pl-2">
+          <div className="flex flex-wrap gap-2">
+            {isGlobalLabelsLoading && globalLabels.length === 0 ? (
+              <LoadingSpinner className="size-4" />
             ) : (
-              <SortableContext
-                items={boards.map((board) => board.id)}
-                strategy={verticalListSortingStrategy}
-              >
-                {boards.map((board) => (
-                  <SortableBoard key={board.id} board={board} />
-                ))}
-              </SortableContext>
+              globalLabels.map((label) => <LabelChip key={label.id} label={label} />)
             )}
           </div>
-          <DragOverlay>{activeLabel && <BoardDragOverlay name={activeLabel} />}</DragOverlay>
-        </DndContext>
-      </ScrollArea>
+        </ScrollArea>
+      </div>
     </section>
   );
 };

@@ -9,7 +9,7 @@ import { LoadingSpinner } from '@/components/base/LoadingSpinner';
 import { DEFAULT_TABLE_OPERATIONS } from '@/constants/generalConstants';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { cn } from '@/lib/utils';
-import { getTasksAsync, searchAllColumnsAsync } from '@/services/taskService';
+import { applyGlobalFiltersAsync, getTasksAsync } from '@/services/taskService';
 import { selectColumnTasks, selectGlobalQuery } from '@/slices/taskSlice';
 import {
   parseFilters,
@@ -37,7 +37,7 @@ const TaskSearchBar = () => {
   const onSubmit = (data: string) => {
     const trimmed = data.trim();
     if (trimmed === globalQuery) return;
-    dispatch(searchAllColumnsAsync(trimmed));
+    dispatch(applyGlobalFiltersAsync({ query: trimmed }));
     const updated = withGlobalQuery(searchParams, trimmed);
     router.replace(`${pathname}?${updated.toString()}`, { scroll: false });
   };

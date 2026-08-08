@@ -41,10 +41,16 @@ const refetchColumn = ({ dispatch, getState }: RefetchProps, columnId: string) =
   );
 };
 
-const searchAllColumnsAsync = createAsyncThunk<void, string, ThunkConfig>(
-  'tasks/searchAllColumnsAsync',
-  async (query, { dispatch, getState }) => {
-    const trimmed = query.trim();
+interface GlobalFilters {
+  query?: string;
+  labelIds?: string[];
+}
+
+const applyGlobalFiltersAsync = createAsyncThunk<void, GlobalFilters, ThunkConfig>(
+  'tasks/applyGlobalFiltersAsync',
+  async (_filters, { dispatch, getState }) => {
+    const { globalQuery, globalLabelIds } = getState().task;
+    const trimmedQuery = globalQuery.trim();
     const { columns } = getState().column;
     const unfilteredColumns = columns.filter(
       (column) =>
@@ -60,8 +66,9 @@ const searchAllColumnsAsync = createAsyncThunk<void, string, ThunkConfig>(
             ...tableOperations,
             columnId: column.id,
             pageIndex: DEFAULT_TABLE_OPERATIONS.pageIndex,
-            query: trimmed,
-            isGlobalSearch: trimmed !== ''
+            query: trimmedQuery,
+            labelIds: globalLabelIds,
+            isGlobalSearch: trimmedQuery !== '' || globalLabelIds.length > 0
           })
         );
       })
@@ -149,6 +156,6 @@ export {
   updateTaskAsync,
   moveTaskAsync,
   deleteTaskAsync,
-  searchAllColumnsAsync,
+  applyGlobalFiltersAsync,
   resetAllFiltersAsync
 };

@@ -3,6 +3,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { errorAlertMiddleware } from '@/lib/errorMiddleware';
 import boardReducer from '@/slices/boardSlice';
 import columnReducer from '@/slices/columnSlice';
+import labelReducer from '@/slices/labelSlice';
 import taskReducer from '@/slices/taskSlice';
 
 export const makeStore = () => {
@@ -10,7 +11,8 @@ export const makeStore = () => {
     reducer: {
       task: taskReducer,
       column: columnReducer,
-      board: boardReducer
+      board: boardReducer,
+      label: labelReducer
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(errorAlertMiddleware)
   });

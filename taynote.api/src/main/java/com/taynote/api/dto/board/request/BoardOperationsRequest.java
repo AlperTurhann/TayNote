@@ -1,5 +1,6 @@
 package com.taynote.api.dto.board.request;
 
+import java.util.List;
 import java.util.UUID;
 
 public class BoardOperationsRequest {
@@ -9,6 +10,7 @@ public class BoardOperationsRequest {
     private int pageSize;
     private String query;
     private UUID columnId;
+    private List<UUID> labelIds;
 
     public UUID getColumnId() {
         return columnId;
@@ -16,6 +18,14 @@ public class BoardOperationsRequest {
 
     public void setColumnId(UUID columnId) {
         this.columnId = columnId;
+    }
+
+    public List<UUID> getLabelIds() {
+        return labelIds;
+    }
+
+    public void setLabelIds(List<UUID> labelIds) {
+        this.labelIds = labelIds;
     }
 
     public String getSorting() {

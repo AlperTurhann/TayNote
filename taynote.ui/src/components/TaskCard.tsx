@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form';
 import { Button } from '@/components/base/Button';
 import Input from '@/components/base/Input';
 import { LoadingSpinner } from '@/components/base/LoadingSpinner';
+import { LabelBadge } from '@/components/Label';
 import { TaskDetailDialog } from '@/components/TaskDetailDialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { VerificationRequiredButton } from '@/components/VerificationRequiredButton';
@@ -288,7 +289,20 @@ const TaskCard = ({ task }: TaskCardProps) => {
         </div>
       </div>
       <div className="flex items-center justify-between">
-        <div>{(isUpdating || isDeleting) && <LoadingSpinner className="size-4" />}</div>
+        <div className="flex items-center gap-x-1">
+          {(isUpdating || isDeleting) && <LoadingSpinner className="size-4" />}
+          {task.labels.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {task.labels.map((label) => (
+                <LabelBadge
+                  key={label.id}
+                  label={label}
+                  className={cn(task.completed ? 'bg-base-700' : 'bg-base-600')}
+                />
+              ))}
+            </div>
+          )}
+        </div>
         {!isEditingTitle && (
           <Button
             colorVariant="ghost"

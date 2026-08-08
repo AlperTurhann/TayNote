@@ -26,7 +26,7 @@ const buttonVariants = cva(
 );
 
 interface Props extends React.ComponentProps<'button'> {
-  colorVariant: VariantProps<typeof buttonVariants>['color'];
+  colorVariant?: VariantProps<typeof buttonVariants>['color'];
 }
 
 const Button = ({ colorVariant, className, type = 'button', ...props }: Props) => {

@@ -1,6 +1,8 @@
 package com.taynote.api.service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -18,11 +20,13 @@ import com.taynote.api.dto.task.response.CreateTaskResponse;
 import com.taynote.api.dto.task.response.TaskSearchResponse;
 import com.taynote.api.dto.task.response.UpdateTaskResponse;
 import com.taynote.api.entity.BoardColumn;
+import com.taynote.api.entity.Label;
 import com.taynote.api.entity.Task;
 import com.taynote.api.exception.column.ColumnNotFoundException;
 import com.taynote.api.exception.task.TaskNotFoundException;
 import com.taynote.api.mapper.TaskMapper;
 import com.taynote.api.repository.ColumnRepository;
+import com.taynote.api.repository.LabelRepository;
 import com.taynote.api.repository.TaskRepository;
 
 @Service
@@ -30,10 +34,21 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
     private final ColumnRepository columnRepository;
+    private final LabelRepository labelRepository;
 
-    public TaskService(TaskRepository taskRepository, ColumnRepository columnRepository) {
+    public TaskService(TaskRepository taskRepository, ColumnRepository columnRepository,
+            LabelRepository labelRepository) {
         this.taskRepository = taskRepository;
         this.columnRepository = columnRepository;
+        this.labelRepository = labelRepository;
+    }
+
+    private BoardColumn findColumn(UUID columnId) {
+        return columnRepository.findById(columnId).orElseThrow(() -> new ColumnNotFoundException(columnId));
+    }
+
+    private Set<Label> findLabels(List<UUID> labelIds) {
+        return new HashSet<>(labelRepository.findAllById(labelIds));
     }
 
     public TaskSearchResponse search(BoardOperationsRequest request) {
@@ -45,9 +60,16 @@ public class TaskService {
         int pageIndex = Math.max(request.getPageIndex() - 1, 0);
         Pageable pageable = PageRequest.of(pageIndex, request.getPageSize(), sort);
         String query = request.getQuery() == null ? "" : request.getQuery();
+        List<UUID> labelIds = request.getLabelIds();
+        boolean hasLabelFilter = labelIds != null && !labelIds.isEmpty();
         Page<Task> page;
 
-        if (request.getColumnId() != null) {
+        if (hasLabelFilter && request.getColumnId() != null) {
+            page = taskRepository.findByColumn_IdAndTitleContainingIgnoreCaseAndLabels_IdIn(
+                    request.getColumnId(), query, labelIds, pageable);
+        } else if (hasLabelFilter) {
+            page = taskRepository.findByTitleContainingIgnoreCaseAndLabels_IdIn(query, labelIds, pageable);
+        } else if (request.getColumnId() != null) {
             page = taskRepository.findByColumn_IdAndTitleContainingIgnoreCase(
                     request.getColumnId(), query, pageable);
         } else {
@@ -65,6 +87,9 @@ public class TaskService {
         task.setColor(request.getColor());
         task.setDescription(request.getDescription());
         task.setColumn(findColumn(request.getColumnId()));
+        if (request.getLabelIds() != null) {
+            task.setLabels(findLabels(request.getLabelIds()));
+        }
         return TaskMapper.toCreateResponse(taskRepository.save(task));
     }
 
@@ -81,6 +106,9 @@ public class TaskService {
         }
         if (request.getCompleted() != null) {
             task.setCompleted(request.getCompleted());
+        }
+        if (request.getLabelIds() != null) {
+            task.setLabels(findLabels(request.getLabelIds()));
         }
         return TaskMapper.toUpdateResponse(taskRepository.save(task));
     }
@@ -102,10 +130,6 @@ public class TaskService {
         taskRepository.saveAll(destTasks);
 
         return TaskMapper.toUpdateColumnResponse(task);
-    }
-
-    private BoardColumn findColumn(UUID columnId) {
-        return columnRepository.findById(columnId).orElseThrow(() -> new ColumnNotFoundException(columnId));
     }
 
     public void delete(UUID id) {

@@ -1,6 +1,8 @@
 package com.taynote.api.entity;
 
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -9,6 +11,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
@@ -41,6 +45,10 @@ public class Task {
     @ManyToOne
     @JoinColumn(name = "column_id", nullable = false)
     private BoardColumn column;
+
+    @ManyToMany
+    @JoinTable(name = "task_labels", joinColumns = @JoinColumn(name = "task_id"), inverseJoinColumns = @JoinColumn(name = "label_id"))
+    private Set<Label> labels = new HashSet<>();
 
     public UUID getId() {
         return id;
@@ -104,5 +112,13 @@ public class Task {
 
     public void setColumn(BoardColumn column) {
         this.column = column;
+    }
+
+    public Set<Label> getLabels() {
+        return labels;
+    }
+
+    public void setLabels(Set<Label> labels) {
+        this.labels = labels;
     }
 }

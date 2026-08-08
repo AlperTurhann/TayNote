@@ -6,10 +6,16 @@ interface ColumnFilter {
 }
 
 const GLOBAL_QUERY_PARAM = 'q';
+const GLOBAL_LABELS_PARAM = 'labels';
 const FILTERS_PARAM = 'filters';
 
 const parseGlobalQuery = (searchParams: URLSearchParams): string =>
   searchParams.get(GLOBAL_QUERY_PARAM) ?? '';
+
+const parseGlobalLabelIds = (searchParams: URLSearchParams): string[] => {
+  const raw = searchParams.get(GLOBAL_LABELS_PARAM);
+  return raw ? raw.split(',').filter(Boolean) : [];
+};
 
 const parseFilters = (searchParams: URLSearchParams): Record<string, ColumnFilter> => {
   const raw = searchParams.get(FILTERS_PARAM);
@@ -31,6 +37,13 @@ const withGlobalQuery = (searchParams: URLSearchParams, query: string): URLSearc
   return next;
 };
 
+const withGlobalLabelIds = (searchParams: URLSearchParams, labelIds: string[]): URLSearchParams => {
+  const next = new URLSearchParams(searchParams);
+  if (labelIds.length === 0) next.delete(GLOBAL_LABELS_PARAM);
+  else next.set(GLOBAL_LABELS_PARAM, labelIds.join(','));
+  return next;
+};
+
 const withColumnFilter = (
   searchParams: URLSearchParams,
   columnId: string,
@@ -48,5 +61,12 @@ const withColumnFilter = (
   return next;
 };
 
-export { parseGlobalQuery, parseFilters, withGlobalQuery, withColumnFilter };
+export {
+  parseGlobalQuery,
+  parseGlobalLabelIds,
+  parseFilters,
+  withGlobalQuery,
+  withGlobalLabelIds,
+  withColumnFilter
+};
 export type { ColumnFilter };
