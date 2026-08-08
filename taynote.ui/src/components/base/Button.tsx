@@ -15,7 +15,8 @@ const buttonVariants = cva(
         white: 'bg-white/10 hover:bg-white/20',
         base: 'bg-base-600 hover:bg-base-500',
         ghost: 'hover:bg-white/20',
-        darkGhost: 'hover:bg-gray-900/20'
+        darkGhost: 'hover:bg-gray-900/20',
+        foreground: 'hover:text-white'
       }
     },
     defaultVariants: {
@@ -25,7 +26,7 @@ const buttonVariants = cva(
 );
 
 interface Props extends React.ComponentProps<'button'> {
-  colorVariant?: VariantProps<typeof buttonVariants>['color'];
+  colorVariant: VariantProps<typeof buttonVariants>['color'];
 }
 
 const Button = ({ colorVariant, className, type = 'button', ...props }: Props) => {

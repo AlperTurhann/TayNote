@@ -15,8 +15,8 @@ public final class TaskMapper {
     }
 
     public static TaskDto toDto(Task task) {
-        return new TaskDto(task.getId(), task.getTitle(), task.getColor(), task.getCompleted(),
-                task.getColumn().getId());
+        return new TaskDto(task.getId(), task.getTitle(), task.getColor(), task.getDescription(),
+                task.getCompleted(), task.getColumn().getId());
     }
 
     public static TaskSearchResponse toSearchResponse(List<TaskDto> items, boolean hasMore) {
@@ -24,13 +24,13 @@ public final class TaskMapper {
     }
 
     public static CreateTaskResponse toCreateResponse(Task task) {
-        return new CreateTaskResponse(task.getId(), task.getTitle(), task.getColor(), task.getCompleted(),
-                task.getColumn().getId());
+        return new CreateTaskResponse(task.getId(), task.getTitle(), task.getColor(), task.getDescription(),
+                task.getCompleted(), task.getColumn().getId());
     }
 
     public static UpdateTaskResponse toUpdateResponse(Task task) {
-        return new UpdateTaskResponse(task.getId(), task.getTitle(), task.getColor(), task.getCompleted(),
-                task.getColumn().getId());
+        return new UpdateTaskResponse(task.getId(), task.getTitle(), task.getColor(), task.getDescription(),
+                task.getCompleted(), task.getColumn().getId());
     }
 
     public static UpdateTaskColumnResponse toUpdateColumnResponse(Task task) {

@@ -7,13 +7,16 @@ public class CreateTaskResponse {
     private UUID id;
     private String title;
     private String color;
+    private String description;
     private boolean completed;
     private UUID columnId;
 
-    public CreateTaskResponse(UUID id, String title, String color, boolean completed, UUID columnId) {
+    public CreateTaskResponse(UUID id, String title, String color, String description, boolean completed,
+            UUID columnId) {
         this.id = id;
         this.title = title;
         this.color = color;
+        this.description = description;
         this.completed = completed;
         this.columnId = columnId;
     }
@@ -28,6 +31,10 @@ public class CreateTaskResponse {
 
     public String getColor() {
         return color;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public boolean getCompleted() {

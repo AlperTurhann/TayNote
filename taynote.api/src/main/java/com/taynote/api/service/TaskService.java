@@ -63,6 +63,7 @@ public class TaskService {
         Task task = new Task();
         task.setTitle(request.getTitle());
         task.setColor(request.getColor());
+        task.setDescription(request.getDescription());
         task.setColumn(findColumn(request.getColumnId()));
         return TaskMapper.toCreateResponse(taskRepository.save(task));
     }
@@ -74,6 +75,9 @@ public class TaskService {
         }
         if (request.getColor() != null) {
             task.setColor(request.getColor());
+        }
+        if (request.getDescription() != null) {
+            task.setDescription(request.getDescription());
         }
         if (request.getCompleted() != null) {
             task.setCompleted(request.getCompleted());

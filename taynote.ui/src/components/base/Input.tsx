@@ -1,12 +1,13 @@
 import { AlertCircle } from 'lucide-react';
 import React from 'react';
 import {
+  Control,
   FieldErrors,
   Path,
   PathValue,
   UseFormRegister,
   UseFormSetValue,
-  UseFormWatch
+  useWatch
 } from 'react-hook-form';
 
 import {
@@ -16,11 +17,24 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 
 type FieldType = 'text' | 'textarea' | 'select' | 'color';
 
-interface Props<T extends Record<string, unknown>> {
+interface CharacterCounterProps<T extends Record<string, unknown>> {
+  control?: Control<T>;
+  name: Path<T>;
+  maxLength: number;
+}
+
+interface ColorHexFieldProps<T extends Record<string, unknown>> {
+  control?: Control<T>;
+  name: Path<T>;
+  setValue?: UseFormSetValue<T>;
+}
+
+interface CommonProps<T extends Record<string, unknown>> {
   fieldType?: FieldType;
   type?: string;
   disabled?: boolean;
@@ -35,7 +49,6 @@ interface Props<T extends Record<string, unknown>> {
   options?: string[];
   onValueChange?: (value: string) => void;
   register: UseFormRegister<T>;
-  watch?: UseFormWatch<T>;
   setValue?: UseFormSetValue<T>;
   errors: FieldErrors<T>;
   autoFocus?: boolean;
@@ -44,15 +57,56 @@ interface Props<T extends Record<string, unknown>> {
   iconError?: boolean;
 }
 
+type Props<T extends Record<string, unknown>> = CommonProps<T> &
+  ({ maxLength: number; control: Control<T> } | { maxLength?: undefined; control?: Control<T> });
+
+function CharacterCounter<T extends Record<string, unknown>>({
+  control,
+  name,
+  maxLength
+}: Readonly<CharacterCounterProps<T>>) {
+  const value = (useWatch({ control, name }) as string | undefined) ?? '';
+  return (
+    <span className="self-end text-xs text-base-400">
+      {value.length} / {maxLength}
+    </span>
+  );
+}
+
+function ColorHexField<T extends Record<string, unknown>>({
+  control,
+  name,
+  setValue
+}: Readonly<ColorHexFieldProps<T>>) {
+  const hex = (useWatch({ control, name }) as string | undefined)?.toUpperCase();
+  const hexDigits = hex?.replace(/^#/, '') ?? '';
+  return (
+    <input
+      type="text"
+      value={hexDigits}
+      onChange={(e) => {
+        const digits = e.target.value.replace(/[^0-9a-fA-F]/g, '').toUpperCase();
+        setValue?.(name, `#${digits}` as PathValue<T, Path<T>>, {
+          shouldValidate: true,
+          shouldDirty: true
+        });
+      }}
+      placeholder="000000"
+      className="w-20 bg-transparent font-medium outline-none -ml-2"
+    />
+  );
+}
+
 const Input = <T extends Record<string, unknown>>({
   fieldType = 'text',
   required,
   label,
   name,
+  maxLength,
   options = [],
   onValueChange,
   register,
-  watch,
+  control,
   setValue,
   errors,
   className,
@@ -105,18 +159,23 @@ const Input = <T extends Record<string, unknown>>({
       case 'textarea':
         return (
           <>
-            <textarea
+            <Textarea
               rows={5}
-              className={cn('font-medium rounded-lg p-2 bg-base-600', className)}
+              maxLength={maxLength}
+              className={cn(
+                'resize-none rounded-lg border-none bg-base-600 placeholder:text-base-400 focus-visible:ring-white focus-visible:ring-2',
+                className
+              )}
               {...props}
               {...register(name)}
             />
+            {maxLength !== undefined && (
+              <CharacterCounter control={control} name={name} maxLength={maxLength} />
+            )}
             {renderError()}
           </>
         );
-      case 'color': {
-        const hex = (watch?.(name) as string | undefined)?.toUpperCase();
-        const hexDigits = hex?.replace(/^#/, '') ?? '';
+      case 'color':
         return (
           <>
             <label
@@ -132,24 +191,11 @@ const Input = <T extends Record<string, unknown>>({
                 {...props}
               />
               <span className="font-medium">#</span>
-              <input
-                type="text"
-                value={hexDigits}
-                onChange={(e) => {
-                  const digits = e.target.value.replace(/[^0-9a-fA-F]/g, '').toUpperCase();
-                  setValue?.(name, `#${digits}` as PathValue<T, Path<T>>, {
-                    shouldValidate: true,
-                    shouldDirty: true
-                  });
-                }}
-                placeholder="000000"
-                className="w-20 bg-transparent font-medium outline-none -ml-2"
-              />
+              <ColorHexField control={control} name={name} setValue={setValue} />
             </label>
             {renderError()}
           </>
         );
-      }
       case 'text':
       default:
         return (
@@ -157,9 +203,13 @@ const Input = <T extends Record<string, unknown>>({
             <input
               className={cn('font-medium rounded-lg p-2 bg-base-600', className)}
               type={fieldType}
+              maxLength={maxLength}
               {...register(name)}
               {...props}
             />
+            {maxLength !== undefined && (
+              <CharacterCounter control={control} name={name} maxLength={maxLength} />
+            )}
             {renderError()}
           </>
         );

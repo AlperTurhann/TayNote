@@ -10,6 +10,7 @@ interface CreateTask {
 interface Task extends CreateTask {
   id: string;
   completed: boolean;
+  description?: string | null;
 }
 
 interface TaskWithStatus extends Task {

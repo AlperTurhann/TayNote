@@ -26,6 +26,9 @@ public class Task {
     @Column(nullable = false)
     private String color;
 
+    @Column(columnDefinition = "text")
+    private String description;
+
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean completed = false;
 
@@ -61,6 +64,14 @@ public class Task {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public boolean getCompleted() {

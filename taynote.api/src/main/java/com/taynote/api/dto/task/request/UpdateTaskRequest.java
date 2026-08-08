@@ -6,6 +6,7 @@ public class UpdateTaskRequest {
 
     private String title;
     private String color;
+    private String description;
     private Boolean completed;
     private UUID columnId;
 
@@ -23,6 +24,14 @@ public class UpdateTaskRequest {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Boolean getCompleted() {

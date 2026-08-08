@@ -1,12 +1,13 @@
 'use client';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Check, CheckCircle2, Pencil, X } from 'lucide-react';
-import React, { useRef, useState } from 'react';
+import { Check, CheckCircle2, Maximize2, Pencil, X } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { Button } from '@/components/base/Button';
 import Input from '@/components/base/Input';
 import { LoadingSpinner } from '@/components/base/LoadingSpinner';
+import { TaskDetailDialog } from '@/components/TaskDetailDialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { VerificationRequiredButton } from '@/components/VerificationRequiredButton';
 import { useAppDispatch } from '@/lib/hooks';
@@ -23,6 +24,39 @@ interface NewTaskCardProps {
 interface TaskCardProps {
   task: TaskWithStatus;
 }
+
+interface TaskColorSwatchProps {
+  task: Task;
+  disabled?: boolean;
+}
+
+const TaskColorSwatch = ({ task, disabled }: TaskColorSwatchProps) => {
+  const dispatch = useAppDispatch();
+  const [color, setColor] = useState<string>(task.color);
+
+  useEffect(() => {
+    setColor(task.color);
+  }, [task.color]);
+
+  const commitColor = () => {
+    if (color !== task.color) {
+      dispatch(updateTaskAsync({ ...task, color }));
+    }
+  };
+
+  return (
+    <input
+      type="color"
+      value={color}
+      disabled={disabled}
+      onChange={(e) => setColor(e.target.value)}
+      onBlur={commitColor}
+      aria-label="Task color"
+      title="Change task color"
+      className="absolute inset-y-0 left-0 w-2 h-full shrink-0 cursor-pointer appearance-none border-0 bg-transparent p-0 outline-none transition-[width] duration-150 hover:w-3 disabled:cursor-not-allowed [&::-webkit-color-swatch]:w-full [&::-webkit-color-swatch]:border-0 [&::-webkit-color-swatch-wrapper]:h-full [&::-webkit-color-swatch-wrapper]:w-full [&::-webkit-color-swatch-wrapper]:p-0 [&::-moz-color-swatch]:h-full [&::-moz-color-swatch]:w-full [&::-moz-color-swatch]:border-0"
+    />
+  );
+};
 
 const NewTaskPlaceholder = () => {
   return (
@@ -71,7 +105,7 @@ const NewTaskCard = ({ columnId, onCancel }: NewTaskCardProps) => {
   const {
     register,
     handleSubmit,
-    watch,
+    control,
     setValue,
     formState: { errors, isSubmitting }
   } = useForm<TaskFormData>({
@@ -103,7 +137,7 @@ const NewTaskCard = ({ columnId, onCancel }: NewTaskCardProps) => {
         label="Color"
         name="color"
         register={register}
-        watch={watch}
+        control={control}
         setValue={setValue}
         fieldType="color"
         required
@@ -174,12 +208,12 @@ const TaskCard = ({ task }: TaskCardProps) => {
   return (
     <div
       className={cn(
-        'w-full relative flex flex-col transition-colors duration-200 p-2 gap-y-2 border-l-4',
+        'w-full relative flex flex-col transition-colors duration-200 p-2 pl-4 gap-y-2',
         task.completed ? 'bg-base-900/50' : 'bg-base-700',
         (isUpdating || isDeleting) && 'opacity-50'
       )}
-      style={{ borderLeftColor: task.color }}
     >
+      <TaskColorSwatch task={taskData} disabled={isUpdating || isDeleting} />
       <div className={cn('flex justify-between gap-x-2', isEditingTitle && 'flex-col')}>
         {isEditingTitle ? (
           <Input<TaskFormData>
@@ -232,6 +266,14 @@ const TaskCard = ({ task }: TaskCardProps) => {
                   <Pencil size={14} />
                 </Button>
               )}
+              <TaskDetailDialog
+                task={taskData}
+                button={
+                  <Button colorVariant="ghost" className="rounded-full p-1" title="Task details">
+                    <Maximize2 size={14} />
+                  </Button>
+                }
+              />
               <VerificationRequiredButton
                 button={
                   <Button colorVariant="ghost" className="rounded-full p-1" disabled={isDeleting}>

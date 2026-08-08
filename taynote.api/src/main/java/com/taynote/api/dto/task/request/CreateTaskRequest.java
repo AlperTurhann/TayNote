@@ -6,6 +6,7 @@ public class CreateTaskRequest {
 
     private String title;
     private String color;
+    private String description;
     private UUID columnId;
 
     public String getTitle() {
@@ -22,6 +23,14 @@ public class CreateTaskRequest {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public UUID getColumnId() {
