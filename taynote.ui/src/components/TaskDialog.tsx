@@ -139,10 +139,16 @@ const TaskDialog = (props: TaskDialogProps) => {
     setIsEditing(false);
   });
 
+  const dialogTitle = (() => {
+    if (isCreate) return 'New Task';
+    if (isEditing) return 'Edit Task';
+    return 'Task Details';
+  })();
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       {triggerButton && <DialogTrigger asChild>{triggerButton}</DialogTrigger>}
-      <DialogContent className="border-base-600 bg-base-800 text-base-100">
+      <DialogContent className="min-w-2/4 border-base-600 bg-base-800 text-base-100">
         {!isCreate && !isEditing && (
           <Button
             colorVariant="foreground"
@@ -154,47 +160,53 @@ const TaskDialog = (props: TaskDialogProps) => {
           </Button>
         )}
         <DialogHeader>
-          <DialogTitle>{isCreate ? 'New Task' : 'Task Details'}</DialogTitle>
+          <DialogTitle>{dialogTitle}</DialogTitle>
         </DialogHeader>
         {isEditing ? (
           <form onSubmit={onSubmit} className="flex flex-col gap-y-3">
-            <Input<TaskDetailFormData>
-              errors={errors}
-              label="Title"
-              name="title"
-              register={register}
-              required
-              placeholder="Task Title"
-              autoFocus
-            />
-            <Input<TaskDetailFormData>
-              errors={errors}
-              label="Color"
-              name="color"
-              register={register}
-              control={control}
-              setValue={setValue}
-              fieldType="color"
-              required
-            />
-            <Input<TaskDetailFormData>
-              errors={errors}
-              label="Description"
-              name="description"
-              register={register}
-              control={control}
-              fieldType="textarea"
-              placeholder="Add a more detailed description..."
-              maxLength={TASK_DESCRIPTION_MAX_LENGTH}
-            />
-            <div className="flex flex-col gap-y-1">
-              <p className="font-medium">Labels</p>
-              <LabelToggleList
-                labels={availableLabels}
-                selectedLabelIds={selectedLabelIds}
-                onToggle={toggleLabel}
-                emptyMessage="No labels yet. Create one from the labels panel."
-              />
+            <div className="flex gap-x-4">
+              <div className="w-2/3 flex flex-col gap-y-2">
+                <Input<TaskDetailFormData>
+                  errors={errors}
+                  label="Title"
+                  name="title"
+                  register={register}
+                  required
+                  placeholder="Task Title"
+                  autoFocus
+                />
+                <Input<TaskDetailFormData>
+                  errors={errors}
+                  label="Description"
+                  name="description"
+                  register={register}
+                  control={control}
+                  fieldType="textarea"
+                  placeholder="Add a more detailed description..."
+                  maxLength={TASK_DESCRIPTION_MAX_LENGTH}
+                />
+              </div>
+              <div className="w-1/3 flex flex-col gap-y-2">
+                <Input<TaskDetailFormData>
+                  errors={errors}
+                  label="Color"
+                  name="color"
+                  register={register}
+                  control={control}
+                  setValue={setValue}
+                  fieldType="color"
+                  required
+                />
+                <div className="flex flex-col gap-y-1">
+                  <p className="font-medium">Labels</p>
+                  <LabelToggleList
+                    labels={availableLabels}
+                    selectedLabelIds={selectedLabelIds}
+                    onToggle={toggleLabel}
+                    emptyMessage="No labels yet. Create one from the labels panel."
+                  />
+                </div>
+              </div>
             </div>
             <DialogFooter>
               <Button
@@ -205,7 +217,12 @@ const TaskDialog = (props: TaskDialogProps) => {
               >
                 Cancel
               </Button>
-              <Button colorVariant="green" type="submit" disabled={isSaving} className="w-24 rounded">
+              <Button
+                colorVariant="green"
+                type="submit"
+                disabled={isSaving}
+                className="w-24 rounded"
+              >
                 {isCreate ? 'Add' : 'Save'}
               </Button>
             </DialogFooter>
