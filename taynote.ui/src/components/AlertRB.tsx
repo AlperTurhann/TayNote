@@ -70,6 +70,7 @@ const AlertItem = ({ alertInfo, bottom, hideAlert, onHeightChange }: AlertItemPr
         colorVariant="darkGhost"
         className="absolute top-1 right-1 rounded-full p-1 text-destructive"
         onClick={() => hideAlert(alertInfo.id)}
+        title="Dismiss notification"
       >
         <X className="size-4" />
       </Button>

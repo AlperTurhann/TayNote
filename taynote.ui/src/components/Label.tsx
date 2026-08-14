@@ -125,6 +125,7 @@ const LabelChip = ({ label }: LabelChipProps) => {
             colorVariant="ghost"
             className="shrink-0 rounded-full p-1"
             disabled={label.isDeleting}
+            title="Delete label"
           >
             <X size={12} />
           </Button>

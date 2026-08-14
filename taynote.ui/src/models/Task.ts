@@ -6,9 +6,11 @@ interface CreateTask {
   title: string;
   color: string;
   columnId: string;
+  description?: string;
+  labelIds?: string[];
 }
 
-interface Task extends CreateTask {
+interface Task extends Omit<CreateTask, 'description' | 'labelIds'> {
   id: string;
   completed: boolean;
   description?: string | null;

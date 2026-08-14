@@ -123,6 +123,7 @@ const BoardLink = ({ board }: BoardButtonProps) => {
             onPointerDown={(e) => e.preventDefault()}
             onClick={confirmEditing}
             disabled={isUpdating}
+            title="Save board name"
           >
             <Check />
           </Button>
@@ -131,6 +132,7 @@ const BoardLink = ({ board }: BoardButtonProps) => {
             onPointerDown={(e) => e.preventDefault()}
             onClick={cancelEditing}
             disabled={isUpdating}
+            title="Cancel board name edit"
           >
             <X />
           </Button>
@@ -149,12 +151,13 @@ const BoardLink = ({ board }: BoardButtonProps) => {
             colorVariant="white"
             onClick={() => setIsEditingName(true)}
             disabled={isUpdating || isDeleting}
+            title="Rename board"
           >
             <Pencil />
           </Button>
           <VerificationRequiredButton
             button={
-              <Button colorVariant="red" disabled={isDeleting}>
+              <Button colorVariant="red" disabled={isDeleting} title="Delete board">
                 <Trash2 />
               </Button>
             }

@@ -67,7 +67,7 @@ function CharacterCounter<T extends Record<string, unknown>>({
 }: Readonly<CharacterCounterProps<T>>) {
   const value = (useWatch({ control, name }) as string | undefined) ?? '';
   return (
-    <span className="self-end text-xs text-base-400">
+    <span className="shrink-0 text-xs mt-0.5 text-base-400">
       {value.length} / {maxLength}
     </span>
   );
@@ -166,13 +166,19 @@ const Input = <T extends Record<string, unknown>>({
                 'resize-none rounded-lg border-none bg-base-600 placeholder:text-base-400 focus-visible:ring-white focus-visible:ring-2',
                 className
               )}
-              {...props}
               {...register(name)}
+              {...props}
             />
-            {maxLength !== undefined && (
-              <CharacterCounter control={control} name={name} maxLength={maxLength} />
+            {iconError ? (
+              renderError()
+            ) : (
+              <div className="flex justify-between gap-x-2">
+                {renderError()}
+                {maxLength !== undefined && (
+                  <CharacterCounter control={control} name={name} maxLength={maxLength} />
+                )}
+              </div>
             )}
-            {renderError()}
           </>
         );
       case 'color':
@@ -207,10 +213,12 @@ const Input = <T extends Record<string, unknown>>({
               {...register(name)}
               {...props}
             />
-            {maxLength !== undefined && (
-              <CharacterCounter control={control} name={name} maxLength={maxLength} />
-            )}
-            {renderError()}
+            <div className="flex justify-between gap-x-2">
+              {renderError()}
+              {maxLength !== undefined && (
+                <CharacterCounter control={control} name={name} maxLength={maxLength} />
+              )}
+            </div>
           </>
         );
     }

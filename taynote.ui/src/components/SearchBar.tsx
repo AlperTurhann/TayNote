@@ -51,7 +51,12 @@ const TaskSearchBar = () => {
       onSubmit={handleSubmit((data) => onSubmit(data.query))}
       className="w-fit h-full flex items-center rounded border gap-x-2 bg-base-600"
     >
-      <Button colorVariant="white" type="submit" className="h-full shrink-0 rounded-l p-2">
+      <Button
+        colorVariant="white"
+        type="submit"
+        className="h-full shrink-0 rounded-l p-2"
+        title="Search board"
+      >
         <Search size={20} />
       </Button>
       <input
@@ -112,7 +117,13 @@ const ColumnSearchBar = ({ columnId, isLoading = false }: ColumnSearchBarProps) 
         className="w-full px-4 focus:outline-none"
         disabled={isLoading}
       />
-      <Button colorVariant="white" type="submit" className="shrink-0" disabled={isLoading}>
+      <Button
+        colorVariant="white"
+        type="submit"
+        className="shrink-0"
+        disabled={isLoading}
+        title="Search column"
+      >
         {isLoading ? <LoadingSpinner className="size-5" /> : <Search size={20} />}
       </Button>
     </form>

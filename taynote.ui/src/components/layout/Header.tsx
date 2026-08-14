@@ -13,7 +13,7 @@ const Header = () => {
   return (
     <header className="relative grid grid-cols-3 border-b p-4">
       <div className="flex items-center gap-x-2">
-        <LinkButton href="/" colorVariant="ghost" className="rounded">
+        <LinkButton href="/" colorVariant="ghost" className="rounded" title="Go to home">
           <House />
         </LinkButton>
       </div>

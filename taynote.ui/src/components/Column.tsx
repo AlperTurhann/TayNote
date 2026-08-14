@@ -11,12 +11,8 @@ import { Button } from '@/components/base/Button';
 import Input from '@/components/base/Input';
 import { SortableTaskCard } from '@/components/dnd/SortableTaskCard';
 import { ColumnSearchBar } from '@/components/SearchBar';
-import {
-  NewTaskCard,
-  NewTaskPlaceholder,
-  TaskCardSkeleton,
-  TaskDropPlaceholder
-} from '@/components/TaskCard';
+import { TaskCardSkeleton, TaskDropPlaceholder } from '@/components/TaskCard';
+import { TaskDialog } from '@/components/TaskDialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { VerificationRequiredButton } from '@/components/VerificationRequiredButton';
@@ -37,7 +33,6 @@ import {
 
 interface ColumnHeaderProps {
   column: ColumnWithStatus;
-  setAddTaskIsHovered: React.Dispatch<React.SetStateAction<boolean>>;
   onAddTaskClick: () => void;
 }
 
@@ -74,7 +69,7 @@ const ColumnDragOverlay = ({ name }: ColumnDragOverlayProps) => {
   );
 };
 
-const ColumnHeader = ({ column, setAddTaskIsHovered, onAddTaskClick }: ColumnHeaderProps) => {
+const ColumnHeader = ({ column, onAddTaskClick }: ColumnHeaderProps) => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const pathname = usePathname();
@@ -171,6 +166,7 @@ const ColumnHeader = ({ column, setAddTaskIsHovered, onAddTaskClick }: ColumnHea
               onPointerDown={(e) => e.preventDefault()}
               onClick={confirmEditing}
               disabled={isUpdating}
+              title="Save column name"
             >
               <Check />
             </Button>
@@ -180,6 +176,7 @@ const ColumnHeader = ({ column, setAddTaskIsHovered, onAddTaskClick }: ColumnHea
               onPointerDown={(e) => e.preventDefault()}
               onClick={cancelEditing}
               disabled={isUpdating}
+              title="Cancel column name edit"
             >
               <X />
             </Button>
@@ -188,16 +185,20 @@ const ColumnHeader = ({ column, setAddTaskIsHovered, onAddTaskClick }: ColumnHea
           <>
             <Button
               className="border border-b-0"
-              onPointerEnter={() => setAddTaskIsHovered(true)}
-              onPointerLeave={() => setAddTaskIsHovered(false)}
               onClick={onAddTaskClick}
               disabled={isDeleting}
+              title="Add task"
             >
               <Plus />
             </Button>
             <VerificationRequiredButton
               button={
-                <Button colorVariant="red" className="border border-b-0" disabled={isDeleting}>
+                <Button
+                  colorVariant="red"
+                  className="border border-b-0"
+                  disabled={isDeleting}
+                  title="Delete column"
+                >
                   <Trash2 />
                 </Button>
               }
@@ -215,7 +216,6 @@ const ColumnHeader = ({ column, setAddTaskIsHovered, onAddTaskClick }: ColumnHea
 const Column = ({ column, placeholderIndex = null, taskCrossedColumn = false }: ColumnProps) => {
   const dispatch = useAppDispatch();
   const searchParams = useSearchParams();
-  const [addTaskIsHovered, setAddTaskIsHovered] = useState<boolean>(false);
   const [isCreatingTask, setIsCreatingTask] = useState<boolean>(false);
   const { tasks, tableOperations, hasMore, isLoading } = useAppSelector(
     selectColumnTasks(column.id)
@@ -261,17 +261,15 @@ const Column = ({ column, placeholderIndex = null, taskCrossedColumn = false }: 
 
   return (
     <section className="w-64 flex-1 flex flex-col overflow-y-hidden shrink-0 rounded-b-md bg-base-800">
-      <ColumnHeader
-        column={column}
-        setAddTaskIsHovered={setAddTaskIsHovered}
-        onAddTaskClick={() => setIsCreatingTask(true)}
-      />
+      <ColumnHeader column={column} onAddTaskClick={() => setIsCreatingTask(true)} />
       <ScrollArea className="min-h-0 flex-1 p-1" onScroll={onScroll}>
         <div ref={setDropZoneRef} className="flex flex-col items-center gap-y-1">
-          {!isCreatingTask && addTaskIsHovered && <NewTaskPlaceholder />}
-          {isCreatingTask && (
-            <NewTaskCard columnId={column.id} onCancel={() => setIsCreatingTask(false)} />
-          )}
+          <TaskDialog
+            mode="create"
+            columnId={column.id}
+            open={isCreatingTask}
+            onOpenChange={setIsCreatingTask}
+          />
           {isLoading && tasks.length === 0 ? (
             SKELETON_KEYS.map((key) => <TaskCardSkeleton key={key} />)
           ) : (

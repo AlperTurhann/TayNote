@@ -1,26 +1,21 @@
 'use client';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Check, CheckCircle2, Maximize2, Pencil, X } from 'lucide-react';
-import React, { useEffect, useRef, useState } from 'react';
+import { Check, CheckCircle2, Maximize2, X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { Button } from '@/components/base/Button';
 import Input from '@/components/base/Input';
 import { LoadingSpinner } from '@/components/base/LoadingSpinner';
 import { LabelBadge } from '@/components/Label';
-import { TaskDetailDialog } from '@/components/TaskDetailDialog';
+import { TaskDialog } from '@/components/TaskDialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { VerificationRequiredButton } from '@/components/VerificationRequiredButton';
 import { useAppDispatch } from '@/lib/hooks';
 import { cn } from '@/lib/utils';
 import { Task, TaskWithStatus } from '@/models/Task';
 import { TaskFormData, TaskFormSchema } from '@/schemas/TaskSchema';
-import { addTaskAsync, deleteTaskAsync, updateTaskAsync } from '@/services/taskService';
-
-interface NewTaskCardProps {
-  columnId: string;
-  onCancel: () => void;
-}
+import { deleteTaskAsync, updateTaskAsync } from '@/services/taskService';
 
 interface TaskCardProps {
   task: TaskWithStatus;
@@ -59,14 +54,6 @@ const TaskColorSwatch = ({ task, disabled }: TaskColorSwatchProps) => {
   );
 };
 
-const NewTaskPlaceholder = () => {
-  return (
-    <div className="w-full h-56 flex items-center justify-center animate-pulse bg-base-700/10">
-      <p className="text-base-300/50">New Task</p>
-    </div>
-  );
-};
-
 const TaskCardSkeleton = () => {
   return (
     <div className="w-full flex flex-col p-2 gap-y-2 border-l-4 border-base-600 bg-base-700">
@@ -98,61 +85,6 @@ const TaskDragOverlay = (task: Task) => {
     >
       <p>{task.title}</p>
     </div>
-  );
-};
-
-const NewTaskCard = ({ columnId, onCancel }: NewTaskCardProps) => {
-  const dispatch = useAppDispatch();
-  const {
-    register,
-    handleSubmit,
-    control,
-    setValue,
-    formState: { errors, isSubmitting }
-  } = useForm<TaskFormData>({
-    resolver: zodResolver(TaskFormSchema),
-    defaultValues: { color: '#4f46e5' }
-  });
-
-  const onSubmit = async (data: TaskFormData) => {
-    await dispatch(addTaskAsync({ ...data, columnId }));
-    onCancel();
-  };
-
-  return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="w-full flex flex-col gap-y-1 p-2 bg-base-700"
-    >
-      <Input<TaskFormData>
-        errors={errors}
-        label="Title"
-        name="title"
-        register={register}
-        required
-        placeholder="Task Title"
-        autoFocus
-      />
-      <Input<TaskFormData>
-        errors={errors}
-        label="Color"
-        name="color"
-        register={register}
-        control={control}
-        setValue={setValue}
-        fieldType="color"
-        required
-        className="w-full"
-      />
-      <div className="grid grid-cols-2 gap-x-2">
-        <Button colorVariant="green" type="submit" className="rounded" disabled={isSubmitting}>
-          Add
-        </Button>
-        <Button colorVariant="base" className="rounded" onClick={onCancel}>
-          Cancel
-        </Button>
-      </div>
-    </form>
   );
 };
 
@@ -215,59 +147,57 @@ const TaskCard = ({ task }: TaskCardProps) => {
       )}
     >
       <TaskColorSwatch task={taskData} disabled={isUpdating || isDeleting} />
-      <div className={cn('flex justify-between gap-x-2', isEditingTitle && 'flex-col')}>
-        {isEditingTitle ? (
-          <Input<TaskFormData>
-            autoFocus
-            errors={errors}
-            name="title"
-            register={register}
-            placeholder="New Task"
-            readOnly={!isEditingTitle}
-            onBlur={cancelEditingTitle}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') confirmEditingTitle();
-              if (e.key === 'Escape') cancelEditingTitle();
-            }}
-            iconError
-            className="w-full rounded-none font-bold p-0 bg-base-700 text-base-100"
-          />
-        ) : (
-          <p>{task.title}</p>
-        )}
-        <div className={cn('h-fit flex items-center', isEditingTitle && 'justify-end')}>
+      <div className={cn('flex justify-between', isEditingTitle ? 'gap-x-0' : 'gap-x-2')}>
+        <Input<TaskFormData>
+          errors={errors}
+          name="title"
+          register={register}
+          placeholder="New Task"
+          readOnly={!isEditingTitle}
+          disabled={task.completed}
+          onFocus={startEditingTitle}
+          onBlur={cancelEditingTitle}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              confirmEditingTitle();
+            }
+            if (e.key === 'Escape') cancelEditingTitle();
+          }}
+          iconError
+          fieldType="textarea"
+          className={cn(
+            'w-full field-sizing-content resize-none rounded-none border-none shadow-none p-1 font-bold bg-transparentx text-base-100 disabled:opacity-100 disabled:cursor-default',
+            isEditingTitle && 'ring'
+          )}
+        />
+        <div className="h-fit flex items-center">
           {isEditingTitle ? (
             <>
               <Button
                 colorVariant="green"
-                className="border"
+                className="size-7 border"
                 onPointerDown={(e) => e.preventDefault()}
                 onClick={confirmEditingTitle}
                 disabled={isUpdating}
+                title="Save title"
               >
                 <Check size={14} />
               </Button>
               <Button
                 colorVariant="red"
-                className="border"
+                className="size-7 border"
                 onPointerDown={(e) => e.preventDefault()}
                 onClick={cancelEditingTitle}
+                title="Cancel title edit"
               >
                 <X size={14} />
               </Button>
             </>
           ) : (
             <>
-              {!task.completed && (
-                <Button
-                  colorVariant="ghost"
-                  className="rounded-full p-1"
-                  onClick={startEditingTitle}
-                >
-                  <Pencil size={14} />
-                </Button>
-              )}
-              <TaskDetailDialog
+              <TaskDialog
+                mode="view"
                 task={taskData}
                 button={
                   <Button colorVariant="ghost" className="rounded-full p-1" title="Task details">
@@ -277,7 +207,12 @@ const TaskCard = ({ task }: TaskCardProps) => {
               />
               <VerificationRequiredButton
                 button={
-                  <Button colorVariant="ghost" className="rounded-full p-1" disabled={isDeleting}>
+                  <Button
+                    colorVariant="ghost"
+                    className="rounded-full p-1"
+                    disabled={isDeleting}
+                    title="Delete task"
+                  >
                     <X size={16} />
                   </Button>
                 }
@@ -303,26 +238,18 @@ const TaskCard = ({ task }: TaskCardProps) => {
             </div>
           )}
         </div>
-        {!isEditingTitle && (
-          <Button
-            colorVariant="ghost"
-            className={cn('rounded-full p-0', task.completed && 'bg-green-900')}
-            onClick={onCompleteTask}
-            disabled={isUpdating}
-          >
-            <CheckCircle2 />
-          </Button>
-        )}
+        <Button
+          colorVariant="ghost"
+          className={cn('rounded-full p-0', task.completed && 'bg-green-900')}
+          onClick={onCompleteTask}
+          disabled={isUpdating || isEditingTitle}
+          title={task.completed ? 'Mark as incomplete' : 'Mark as complete'}
+        >
+          <CheckCircle2 />
+        </Button>
       </div>
     </div>
   );
 };
 
-export {
-  NewTaskPlaceholder,
-  TaskCardSkeleton,
-  TaskDropPlaceholder,
-  TaskDragOverlay,
-  NewTaskCard,
-  TaskCard
-};
+export { TaskCardSkeleton, TaskDropPlaceholder, TaskDragOverlay, TaskCard };

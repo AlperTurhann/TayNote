@@ -33,7 +33,7 @@ const NewColumnForm = ({ boardId }: NewColumnFormProps) => {
   if (!isEditing) {
     return (
       <Button
-        className="h-fit rounded border-2 border-dashed -mt-0.5"
+        className="h-fit rounded border-2 border-dashed mt-0.5"
         onClick={() => setIsEditing(true)}
       >
         <Plus /> New Column
@@ -44,7 +44,7 @@ const NewColumnForm = ({ boardId }: NewColumnFormProps) => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="w-64 h-fit shrink-0 flex flex-col rounded border-2 border-dashed -mt-0.5 p-2 gap-y-1 bg-indigo-950"
+      className="w-64 h-fit shrink-0 flex flex-col rounded border-2 border-dashed mt-0.5 p-2 gap-y-1 bg-indigo-950"
     >
       <Input<ColumnFormData>
         errors={errors}
