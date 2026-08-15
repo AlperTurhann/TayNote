@@ -1,15 +1,21 @@
-import { AlertCircle } from 'lucide-react';
-import React from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { AlertCircle, Plus, X } from 'lucide-react';
+import React, { useEffect } from 'react';
 import {
   Control,
   FieldErrors,
   Path,
   PathValue,
+  useForm,
   UseFormRegister,
   UseFormSetValue,
   useWatch
 } from 'react-hook-form';
 
+import { Button } from '@/components/base/Button';
+import { LoadingSpinner } from '@/components/base/LoadingSpinner';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import {
   Select,
   SelectContent,
@@ -18,7 +24,15 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { cn } from '@/lib/utils';
+import { SavedColorFormData, SavedColorFormSchema } from '@/schemas/SavedColorSchema';
+import {
+  addSavedColorAsync,
+  deleteSavedColorAsync,
+  getSavedColorsAsync
+} from '@/services/savedColorService';
+import { selectIsAddingSavedColor, selectSavedColors } from '@/slices/savedColorSlice';
 
 type FieldType = 'text' | 'textarea' | 'select' | 'color';
 
@@ -60,24 +74,24 @@ interface CommonProps<T extends Record<string, unknown>> {
 type Props<T extends Record<string, unknown>> = CommonProps<T> &
   ({ maxLength: number; control: Control<T> } | { maxLength?: undefined; control?: Control<T> });
 
-function CharacterCounter<T extends Record<string, unknown>>({
+const CharacterCounter = <T extends Record<string, unknown>>({
   control,
   name,
   maxLength
-}: Readonly<CharacterCounterProps<T>>) {
+}: Readonly<CharacterCounterProps<T>>) => {
   const value = (useWatch({ control, name }) as string | undefined) ?? '';
   return (
     <span className="shrink-0 text-xs mt-0.5 text-base-400">
       {value.length} / {maxLength}
     </span>
   );
-}
+};
 
-function ColorHexField<T extends Record<string, unknown>>({
+const ColorHexField = <T extends Record<string, unknown>>({
   control,
   name,
   setValue
-}: Readonly<ColorHexFieldProps<T>>) {
+}: Readonly<ColorHexFieldProps<T>>) => {
   const hex = (useWatch({ control, name }) as string | undefined)?.toUpperCase();
   const hexDigits = hex?.replace(/^#/, '') ?? '';
   return (
@@ -95,7 +109,128 @@ function ColorHexField<T extends Record<string, unknown>>({
       className="w-20 bg-transparent font-medium outline-none -ml-2"
     />
   );
-}
+};
+
+const SaveColorForm = ({ hex }: Readonly<{ hex: string }>) => {
+  const dispatch = useAppDispatch();
+  const isAdding = useAppSelector(selectIsAddingSavedColor);
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors }
+  } = useForm<SavedColorFormData>({
+    resolver: zodResolver(SavedColorFormSchema),
+    defaultValues: { name: '' }
+  });
+
+  const onSubmit = async (data: SavedColorFormData) => {
+    await dispatch(addSavedColorAsync({ name: data.name, hex }));
+    reset({ name: '' });
+  };
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.stopPropagation();
+        handleSubmit(onSubmit)(e);
+      }}
+      className="flex flex-col gap-y-2"
+    >
+      <div className="flex items-center gap-x-2">
+        <span
+          className="size-5 shrink-0 rounded-full border border-white/20"
+          style={{ backgroundColor: hex }}
+        />
+        <span className="text-sm font-medium">{hex.toUpperCase()}</span>
+      </div>
+      <Input<SavedColorFormData>
+        errors={errors}
+        name="name"
+        register={register}
+        control={control}
+        required
+        autoFocus
+        placeholder="Color name"
+        className="w-full text-base-100"
+        disabled={isAdding}
+      />
+      <Button colorVariant="green" type="submit" disabled={isAdding} className="w-full rounded">
+        {isAdding ? <LoadingSpinner /> : <Plus />} Save to Palette
+      </Button>
+    </form>
+  );
+};
+
+const SavedColorPalette = <T extends Record<string, unknown>>({
+  control,
+  name,
+  setValue
+}: Readonly<ColorHexFieldProps<T>>) => {
+  const dispatch = useAppDispatch();
+  const savedColors = useAppSelector(selectSavedColors);
+  const hex = (useWatch({ control, name }) as string | undefined) ?? '';
+
+  useEffect(() => {
+    dispatch(getSavedColorsAsync());
+  }, [dispatch]);
+
+  const pickColor = (colorHex: string) => {
+    setValue?.(name, colorHex as PathValue<T, Path<T>>, {
+      shouldValidate: true,
+      shouldDirty: true
+    });
+  };
+
+  return (
+    <div className="flex items-center gap-x-0.5 px-1 pt-2">
+      <ScrollArea className="min-w-0 h-9">
+        <div className="flex items-center gap-1.5 p-1">
+          {savedColors.map((savedColor) => (
+            <div key={savedColor.id} className="group size-5 relative shrink-0">
+              <button
+                type="button"
+                title={savedColor.name}
+                onClick={() => pickColor(savedColor.hex)}
+                disabled={savedColor.isDeleting}
+                className={cn(
+                  'size-full shrink-0 rounded-full border border-white/20 transition-transform hover:scale-110',
+                  savedColor.isDeleting && 'opacity-50'
+                )}
+                style={{ backgroundColor: savedColor.hex }}
+              />
+              <button
+                type="button"
+                title={`Remove ${savedColor.name}`}
+                onClick={() => dispatch(deleteSavedColorAsync(savedColor.id))}
+                disabled={savedColor.isDeleting}
+                className="absolute -top-1.5 -right-1.5 hidden size-3.5 items-center justify-center rounded-full bg-base-800 text-base-100 group-hover:flex"
+              >
+                <X size={10} />
+              </button>
+            </div>
+          ))}
+        </div>
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
+      <Popover>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            title="Save current color to palette"
+            className="flex size-5 shrink-0 items-center justify-center rounded-full border border-dashed mb-2 border-base-400 text-base-400 hover:border-base-100 hover:text-base-100"
+          >
+            <Plus size={12} />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent className="w-64 border-base-600 bg-base-800 text-base-100">
+          <SaveColorForm hex={hex} />
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+};
 
 const Input = <T extends Record<string, unknown>>({
   fieldType = 'text',
@@ -199,6 +334,7 @@ const Input = <T extends Record<string, unknown>>({
               <span className="font-medium">#</span>
               <ColorHexField control={control} name={name} setValue={setValue} />
             </label>
+            <SavedColorPalette control={control} name={name} setValue={setValue} />
             {renderError()}
           </>
         );

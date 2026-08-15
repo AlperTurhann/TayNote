@@ -169,28 +169,25 @@ const NewLabelForm = ({ boardId }: NewLabelFormProps) => {
         className="w-full text-base-100"
         disabled={isAdding}
       />
-      <div className="w-full flex items-center">
-        <Input<LabelFormData>
-          errors={errors}
-          name="color"
-          register={register}
-          control={control}
-          setValue={setValue}
-          fieldType="color"
-          required
-          disabled={isAdding}
-          parentClassName="w-full"
-          className="w-full rounded-r-none text-base-100"
-        />
-        <Button
-          colorVariant="white"
-          type="submit"
-          className="shrink-0 rounded-l-none rounded-r-lg self-start"
-          disabled={isAdding}
-        >
-          {isAdding ? <LoadingSpinner /> : <Plus />} New Label
-        </Button>
-      </div>
+      <Input<LabelFormData>
+        errors={errors}
+        name="color"
+        register={register}
+        control={control}
+        setValue={setValue}
+        fieldType="color"
+        required
+        disabled={isAdding}
+        className="text-base-100"
+      />
+      <Button
+        colorVariant="green"
+        type="submit"
+        className="shrink-0 rounded self-end px-4 py-1.5"
+        disabled={isAdding}
+      >
+        {isAdding ? <LoadingSpinner /> : <Plus />} New Label
+      </Button>
     </form>
   );
 };

@@ -4,6 +4,7 @@ import { errorAlertMiddleware } from '@/lib/errorMiddleware';
 import boardReducer from '@/slices/boardSlice';
 import columnReducer from '@/slices/columnSlice';
 import labelReducer from '@/slices/labelSlice';
+import savedColorReducer from '@/slices/savedColorSlice';
 import taskReducer from '@/slices/taskSlice';
 
 export const makeStore = () => {
@@ -12,7 +13,8 @@ export const makeStore = () => {
       task: taskReducer,
       column: columnReducer,
       board: boardReducer,
-      label: labelReducer
+      label: labelReducer,
+      savedColor: savedColorReducer
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(errorAlertMiddleware)
   });
