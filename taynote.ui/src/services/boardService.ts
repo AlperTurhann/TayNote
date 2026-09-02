@@ -11,7 +11,7 @@ const getBoardsAsync = createAsyncThunk(
   'boards/getBoardsAsync',
   async (): Promise<TryCatchResult<Board[]>> => {
     return await tryCatch<Board[]>(
-      axios.get<Board[]>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/boards`).then((res) => res.data)
+      axios.get<Board[]>(`/api/boards`).then((res) => res.data)
     );
   }
 );
@@ -21,7 +21,7 @@ const addBoardAsync = createAsyncThunk<TryCatchResult<Board>, CreateBoard, Thunk
   async (data, { dispatch }) => {
     const result = await tryCatch<Board>(
       axios
-        .post<Board>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/boards`, data)
+        .post<Board>(`/api/boards`, data)
         .then((res) => res.data)
     );
     if (!result.error) {
@@ -36,7 +36,7 @@ const updateBoardAsync = createAsyncThunk<TryCatchResult<Board>, Board, ThunkCon
   async ({ id, name }, { dispatch }) => {
     const result = await tryCatch<Board>(
       axios
-        .patch<Board>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/boards/${id}`, {
+        .patch<Board>(`/api/boards/${id}`, {
           name
         })
         .then((res) => res.data)
@@ -53,7 +53,7 @@ const moveBoardAsync = createAsyncThunk<TryCatchResult<Board>, MoveBoard, ThunkC
   async ({ id, targetIndex }, { dispatch }) => {
     const result = await tryCatch<Board>(
       axios
-        .patch<Board>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/boards/${id}/move`, {
+        .patch<Board>(`/api/boards/${id}/move`, {
           targetIndex
         })
         .then((res) => res.data)
@@ -68,7 +68,7 @@ const deleteBoardAsync = createAsyncThunk<TryCatchResult<void>, string, ThunkCon
   async (boardId, { dispatch }) => {
     const result = await tryCatch<void>(
       axios
-        .delete<void>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/boards/${boardId}`)
+        .delete<void>(`/api/boards/${boardId}`)
         .then((res) => res.data)
     );
     if (!result.error) {

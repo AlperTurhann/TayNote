@@ -32,8 +32,8 @@ services:
   frontend:
     build:
       context: ./taynote.ui
-      args:
-        NEXT_PUBLIC_API_BASE_URL: http://localhost:4400
+    environment:
+      BACKEND_URL: http://backend:4400
     ports:
       - "4300:4300"
     depends_on:

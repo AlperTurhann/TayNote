@@ -26,7 +26,7 @@ const getTasksAsync = createAsyncThunk(
   }: GetTasksArgs): Promise<TryCatchResult<TaskSearchResult>> => {
     return await tryCatch<TaskSearchResult>(
       axios
-        .post<TaskSearchResult>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/tasks/search`, data)
+        .post<TaskSearchResult>(`/api/tasks/search`, data)
         .then((res) => res.data),
       { items: [], hasMore: false }
     );
@@ -93,7 +93,7 @@ const addTaskAsync = createAsyncThunk<TryCatchResult<Task>, CreateTask, ThunkCon
   async (data, thunkAPI) => {
     const result = await tryCatch<Task>(
       axios
-        .post<Task>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/tasks`, data)
+        .post<Task>(`/api/tasks`, data)
         .then((res) => res.data)
     );
     if (!result.error) {
@@ -106,9 +106,10 @@ const addTaskAsync = createAsyncThunk<TryCatchResult<Task>, CreateTask, ThunkCon
 const updateTaskAsync = createAsyncThunk<TryCatchResult<UpdateTask>, UpdateTask, ThunkConfig>(
   'tasks/updateTaskAsync',
   async (data, thunkAPI) => {
+    const { id, labels: _labels, ...body } = data;
     const result = await tryCatch<UpdateTask>(
       axios
-        .patch<UpdateTask>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/tasks/${data.id}`, data)
+        .patch<UpdateTask>(`/api/tasks/${id}`, body)
         .then((res) => res.data)
     );
     if (!result.error) {
@@ -123,7 +124,7 @@ const moveTaskAsync = createAsyncThunk<TryCatchResult<UpdateTask>, MoveTask, Thu
   async ({ id, columnId, sourceColumnId, targetIndex }, thunkAPI) => {
     const result = await tryCatch<UpdateTask>(
       axios
-        .patch<UpdateTask>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/tasks/${id}/move`, {
+        .patch<UpdateTask>(`/api/tasks/${id}/move`, {
           columnId,
           targetIndex
         })
@@ -140,7 +141,7 @@ const deleteTaskAsync = createAsyncThunk<TryCatchResult<void>, DeleteTask, Thunk
   async ({ taskId, columnId }, thunkAPI) => {
     const result = await tryCatch<void>(
       axios
-        .delete<void>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/tasks/${taskId}`)
+        .delete<void>(`/api/tasks/${taskId}`)
         .then((res) => res.data)
     );
     if (!result.error) {

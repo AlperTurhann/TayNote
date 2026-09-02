@@ -11,7 +11,7 @@ const getGlobalLabelsAsync = createAsyncThunk(
   'labels/getGlobalLabelsAsync',
   async (): Promise<TryCatchResult<Label[]>> => {
     return await tryCatch<Label[]>(
-      axios.get<Label[]>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/labels`).then((res) => res.data)
+      axios.get<Label[]>(`/api/labels`).then((res) => res.data)
     );
   }
 );
@@ -21,7 +21,7 @@ const getBoardLabelsAsync = createAsyncThunk(
   async (boardId: string): Promise<TryCatchResult<Label[]>> => {
     return await tryCatch<Label[]>(
       axios
-        .get<Label[]>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/labels`, { params: { boardId } })
+        .get<Label[]>(`/api/labels`, { params: { boardId } })
         .then((res) => res.data)
     );
   }
@@ -32,7 +32,7 @@ const addLabelAsync = createAsyncThunk<TryCatchResult<Label>, CreateLabel, Thunk
   async (data, { dispatch }) => {
     const result = await tryCatch<Label>(
       axios
-        .post<Label>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/labels`, data)
+        .post<Label>(`/api/labels`, data)
         .then((res) => res.data)
     );
     if (!result.error) {
@@ -48,7 +48,7 @@ const deleteLabelAsync = createAsyncThunk<TryCatchResult<void>, DeleteLabel, Thu
   async ({ labelId, boardId }, { dispatch }) => {
     const result = await tryCatch<void>(
       axios
-        .delete<void>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/labels/${labelId}`)
+        .delete<void>(`/api/labels/${labelId}`)
         .then((res) => res.data)
     );
     if (!result.error) {

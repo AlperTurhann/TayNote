@@ -9,6 +9,11 @@ interface Props {
   children: ReactNode;
 }
 
+const generateAlertId = () =>
+  typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
 const AlertProvider = ({ children }: Props) => {
   const [alertInfos, setAlertInfos] = useState<AlertInfo[]>([]);
 
@@ -20,7 +25,7 @@ const AlertProvider = ({ children }: Props) => {
     setAlertInfos((prev) => [
       ...prev,
       {
-        id: crypto.randomUUID(),
+        id: generateAlertId(),
         title: 'Successful',
         description: description,
         type: 'success'
@@ -32,7 +37,7 @@ const AlertProvider = ({ children }: Props) => {
     setAlertInfos((prev) => [
       ...prev,
       {
-        id: crypto.randomUUID(),
+        id: generateAlertId(),
         title: 'Failed',
         description: description,
         type: 'failure'

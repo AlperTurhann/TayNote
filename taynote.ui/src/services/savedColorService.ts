@@ -12,7 +12,7 @@ const getSavedColorsAsync = createAsyncThunk(
   async (): Promise<TryCatchResult<SavedColor[]>> => {
     return await tryCatch<SavedColor[]>(
       axios
-        .get<SavedColor[]>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/saved-colors`)
+        .get<SavedColor[]>(`/api/saved-colors`)
         .then((res) => res.data)
     );
   }
@@ -23,7 +23,7 @@ const addSavedColorAsync = createAsyncThunk<TryCatchResult<SavedColor>, CreateSa
   async (data, { dispatch }) => {
     const result = await tryCatch<SavedColor>(
       axios
-        .post<SavedColor>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/saved-colors`, data)
+        .post<SavedColor>(`/api/saved-colors`, data)
         .then((res) => res.data)
     );
     if (!result.error) dispatch(getSavedColorsAsync());
@@ -36,7 +36,7 @@ const deleteSavedColorAsync = createAsyncThunk<TryCatchResult<void>, string, Thu
   async (savedColorId, { dispatch }) => {
     const result = await tryCatch<void>(
       axios
-        .delete<void>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/saved-colors/${savedColorId}`)
+        .delete<void>(`/api/saved-colors/${savedColorId}`)
         .then((res) => res.data)
     );
     if (!result.error) dispatch(getSavedColorsAsync());

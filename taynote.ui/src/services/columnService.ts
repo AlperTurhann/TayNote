@@ -10,7 +10,7 @@ const getColumnsAsync = createAsyncThunk(
   async (boardId: string): Promise<TryCatchResult<Column[]>> => {
     return await tryCatch<Column[]>(
       axios
-        .get<Column[]>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/columns`, { params: { boardId } })
+        .get<Column[]>(`/api/columns`, { params: { boardId } })
         .then((res) => res.data),
       []
     );
@@ -22,7 +22,7 @@ const addColumnAsync = createAsyncThunk(
   async (data: CreateColumn): Promise<TryCatchResult<Column>> => {
     return await tryCatch<Column>(
       axios
-        .post<Column>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/columns`, data)
+        .post<Column>(`/api/columns`, data)
         .then((res) => res.data)
     );
   }
@@ -33,7 +33,7 @@ const updateColumnAsync = createAsyncThunk(
   async ({ id, ...data }: UpdateColumn): Promise<TryCatchResult<Column>> => {
     return await tryCatch<Column>(
       axios
-        .patch<Column>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/columns/${id}`, data)
+        .patch<Column>(`/api/columns/${id}`, data)
         .then((res) => res.data)
     );
   }
@@ -44,7 +44,7 @@ const moveColumnAsync = createAsyncThunk<TryCatchResult<Column>, MoveColumn, Thu
   async ({ id, boardId, targetIndex }, { dispatch }) => {
     const result = await tryCatch<Column>(
       axios
-        .patch<Column>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/columns/${id}/move`, {
+        .patch<Column>(`/api/columns/${id}/move`, {
           targetIndex
         })
         .then((res) => res.data)
@@ -59,7 +59,7 @@ const deleteColumnAsync = createAsyncThunk<TryCatchResult<void>, DeleteColumn, T
   async ({ columnId, boardId }, { dispatch }) => {
     const result = await tryCatch<void>(
       axios
-        .delete<void>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/columns/${columnId}`)
+        .delete<void>(`/api/columns/${columnId}`)
         .then((res) => res.data)
     );
     if (!result.error) {
