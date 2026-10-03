@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle, Plus, X } from 'lucide-react';
-import React, { useEffect } from 'react';
+import React, { useEffect, useId } from 'react';
 import {
   Control,
   FieldErrors,
@@ -249,6 +249,7 @@ const Input = <T extends Record<string, unknown>>({
   iconError,
   ...props
 }: Props<T>) => {
+  const id = useId();
   const errorMessage = errors[name]?.message as string | undefined;
 
   const renderError = () =>
@@ -262,7 +263,7 @@ const Input = <T extends Record<string, unknown>>({
         </span>
       )
     ) : (
-      <span className="min-h-5 text-sm text-red-500">{errorMessage ?? ''}</span>
+      <span className="min-h-5 text-xs leading-5 text-red-400">{errorMessage ?? ''}</span>
     );
 
   const renderField = () => {
@@ -298,9 +299,10 @@ const Input = <T extends Record<string, unknown>>({
               rows={5}
               maxLength={maxLength}
               className={cn(
-                'resize-none rounded-lg border-none bg-base-600 placeholder:text-base-400 focus-visible:ring-white focus-visible:ring-2',
+                'resize-none rounded-lg border-white/10 bg-base-900/60 text-base-100 placeholder:text-base-500 hover:border-white/20 focus-visible:border-indigo-400 focus-visible:ring-2 focus-visible:ring-indigo-500/30',
                 className
               )}
+              id={id}
               {...register(name)}
               {...props}
             />
@@ -321,7 +323,7 @@ const Input = <T extends Record<string, unknown>>({
           <>
             <label
               className={cn(
-                'inline-flex w-fit cursor-pointer items-center gap-x-2 rounded-lg bg-base-600 p-2',
+                'inline-flex w-fit cursor-pointer items-center gap-x-2 rounded-lg border border-white/10 bg-base-900/60 p-2 text-base-100',
                 className
               )}
             >
@@ -343,9 +345,13 @@ const Input = <T extends Record<string, unknown>>({
         return (
           <>
             <input
-              className={cn('font-medium rounded-lg p-2 bg-base-600', className)}
+              className={cn(
+                'rounded-lg border border-white/10 bg-base-900/60 px-3 py-2 text-base-100 outline-none transition-colors placeholder:text-base-500 hover:border-white/20 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/30 disabled:opacity-60',
+                className
+              )}
               type={fieldType}
               maxLength={maxLength}
+              id={id}
               {...register(name)}
               {...props}
             />
@@ -366,7 +372,7 @@ const Input = <T extends Record<string, unknown>>({
       aria-label={name + ' input'}
     >
       {label && (
-        <label className="font-medium" htmlFor={name as string}>
+        <label className="mb-1.5 text-sm font-medium text-base-200" htmlFor={id}>
           {label} {required && <span>*</span>}
         </label>
       )}

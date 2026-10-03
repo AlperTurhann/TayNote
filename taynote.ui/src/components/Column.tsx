@@ -48,23 +48,24 @@ interface ColumnProps {
 
 const ColumnSkeleton = () => {
   return (
-    <section className="w-64 flex flex-col shrink-0 rounded-b-md bg-base-800">
-      <Skeleton className="h-9 w-full rounded-none bg-indigo-900" />
-      <Skeleton className="h-8 w-full rounded-none bg-base-600" />
+    <section className="flex w-[82vw] max-w-80 shrink-0 flex-col gap-y-2 rounded-xl border bg-base-800 p-2 sm:w-72">
+      <Skeleton className="h-9 w-full bg-base-700" />
+      <Skeleton className="h-16 w-full bg-base-700/60" />
+      <Skeleton className="h-16 w-full bg-base-700/60" />
     </section>
   );
 };
 
 const ColumnDropPlaceholder = () => {
   return (
-    <div className="w-64 h-full shrink-0 rounded-md border-2 border-dashed border-indigo-500/50" />
+    <div className="h-full w-[82vw] max-w-80 shrink-0 rounded-xl border-2 border-dashed border-indigo-500/40 bg-indigo-500/5 sm:w-72" />
   );
 };
 
 const ColumnDragOverlay = ({ name }: ColumnDragOverlayProps) => {
   return (
-    <div className="h-10 place-content-center border bg-indigo-900">
-      <p className="p-2 text-center font-bold text-base-100">{name}</p>
+    <div className="h-11 w-72 place-content-center rounded-xl border bg-base-700 shadow-2xl">
+      <p className="p-2 text-center font-semibold text-base-100">{name}</p>
     </div>
   );
 };
@@ -131,14 +132,14 @@ const ColumnHeader = ({ column, onAddTaskClick }: ColumnHeaderProps) => {
 
   return (
     <>
-      <div className="flex items-center shrink-0 border-b bg-indigo-900">
+      <div className="flex shrink-0 items-center gap-x-0.5 p-2">
         <Button
-          colorVariant="white"
-          className="h-full border border-b-0"
+          colorVariant="ghost"
+          className="size-8 shrink-0 p-0"
           onClick={onToggleSorting}
           title={`Sorting: ${tableOperations.sorting}`}
         >
-          <SortIcon size={18} />
+          <SortIcon size={16} />
         </Button>
         <Input<ColumnFormData>
           errors={errors}
@@ -155,51 +156,52 @@ const ColumnHeader = ({ column, onAddTaskClick }: ColumnHeaderProps) => {
             if (e.key === 'Escape') cancelEditing();
           }}
           iconError
-          className="w-full rounded-none bg-transparent p-2 text-center font-bold text-base-100"
+          className="w-full min-w-0 truncate border-transparent bg-transparent px-2 py-1 font-semibold text-base-100 hover:border-white/10"
           disabled={isUpdating || isDeleting}
         />
         {isEditingName ? (
           <>
             <Button
               colorVariant="green"
-              className="border border-b-0"
+              className="size-8 shrink-0 p-0"
               onPointerDown={(e) => e.preventDefault()}
               onClick={confirmEditing}
               disabled={isUpdating}
               title="Save column name"
             >
-              <Check />
+              <Check size={16} />
             </Button>
             <Button
               colorVariant="red"
-              className="border border-b-0"
+              className="size-8 shrink-0 p-0"
               onPointerDown={(e) => e.preventDefault()}
               onClick={cancelEditing}
               disabled={isUpdating}
               title="Cancel column name edit"
             >
-              <X />
+              <X size={16} />
             </Button>
           </>
         ) : (
           <>
             <Button
-              className="border border-b-0"
+              colorVariant="ghost"
+              className="size-8 shrink-0 p-0"
               onClick={onAddTaskClick}
               disabled={isDeleting}
               title="Add task"
             >
-              <Plus />
+              <Plus size={16} />
             </Button>
             <VerificationRequiredButton
               button={
                 <Button
-                  colorVariant="red"
-                  className="border border-b-0"
+                  colorVariant="ghost"
+                  className="size-8 shrink-0 p-0 hover:bg-red-500/15 hover:text-red-300"
                   disabled={isDeleting}
                   title="Delete column"
                 >
-                  <Trash2 />
+                  <Trash2 size={16} />
                 </Button>
               }
               description="This action cannot be undone. This will permanently delete your column."
@@ -260,10 +262,10 @@ const Column = ({ column, placeholderIndex = null, taskCrossedColumn = false }: 
   };
 
   return (
-    <section className="w-64 flex-1 flex flex-col overflow-y-hidden shrink-0 rounded-b-md bg-base-800">
+    <section className="flex min-h-0 w-full flex-1 flex-col overflow-y-hidden rounded-b-xl border border-t-0 bg-base-800">
       <ColumnHeader column={column} onAddTaskClick={() => setIsCreatingTask(true)} />
-      <ScrollArea className="min-h-0 flex-1 p-1" onScroll={onScroll}>
-        <div ref={setDropZoneRef} className="flex flex-col items-center gap-y-1">
+      <ScrollArea className="min-h-0 flex-1 px-2 pb-2" onScroll={onScroll}>
+        <div ref={setDropZoneRef} className="flex min-h-12 flex-col items-center gap-y-2">
           <TaskDialog
             mode="create"
             columnId={column.id}

@@ -27,14 +27,14 @@ const SortableColumn = memo(function SortableColumn({
     <div
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className="flex flex-col shrink-0"
+      className="flex w-[82vw] max-w-80 shrink-0 flex-col sm:w-72"
     >
       {isDragging && <ColumnDropPlaceholder />}
       <div className={isDragging ? 'hidden' : 'contents'}>
         <div
           {...attributes}
           {...listeners}
-          className="flex items-center justify-center h-4 shrink-0 rounded-t-md bg-indigo-950 text-indigo-400 touch-none cursor-grab hover:text-indigo-200 active:cursor-grabbing"
+          className="flex h-5 shrink-0 cursor-grab items-center justify-center rounded-t-xl border border-b-0 bg-base-800 text-base-600 touch-none transition-colors hover:text-base-300 active:cursor-grabbing"
           title="Drag to reorder column"
         >
           <GripHorizontal size={14} />

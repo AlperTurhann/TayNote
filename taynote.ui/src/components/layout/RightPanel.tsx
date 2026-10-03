@@ -37,13 +37,17 @@ const RightPanel = ({ isOpen }: Props) => {
 
   return (
     <aside
+      inert={!isOpen}
+      aria-label="Labels"
       className={cn(
-        'w-72 h-[calc(100vh-100%)] z-50 absolute top-full right-0 flex flex-col gap-y-4 transition-all duration-500 border-l border-t p-4 bg-base-800',
+        'absolute top-full right-0 z-50 flex h-[calc(100dvh-100%)] w-full flex-col overflow-y-auto sm:overflow-hidden gap-y-5 border-l bg-base-800 p-4 shadow-2xl transition-transform duration-300 sm:w-80',
         isOpen ? 'translate-x-0' : 'translate-x-full'
       )}
     >
-      <section className="flex min-h-0 flex-1 flex-col gap-y-2">
-        <h2 className="font-bold text-base-100">Global Labels</h2>
+      <section className="flex shrink-0 flex-col gap-y-2 sm:min-h-0 sm:flex-1 sm:shrink">
+        <h2 className="text-xs font-semibold tracking-wider text-base-400 uppercase">
+          Global labels
+        </h2>
         <NewLabelForm />
         <ScrollArea className="w-[calc(100%+8px)] min-h-0 -ml-2" viewportClassName="pl-2">
           <div className="flex flex-wrap gap-2">
@@ -56,8 +60,10 @@ const RightPanel = ({ isOpen }: Props) => {
         </ScrollArea>
       </section>
       {boardId && (
-        <section className="flex min-h-0 flex-1 flex-col gap-y-2">
-          <h2 className="font-bold text-base-100">Board Labels</h2>
+        <section className="flex shrink-0 flex-col gap-y-2 sm:min-h-0 sm:flex-1 sm:shrink">
+          <h2 className="text-xs font-semibold tracking-wider text-base-400 uppercase">
+            Board labels
+          </h2>
           <NewLabelForm boardId={boardId} />
           <ScrollArea className="w-[calc(100%+8px)] min-h-0 -ml-2" viewportClassName="pl-2">
             <div className="flex flex-wrap gap-2">

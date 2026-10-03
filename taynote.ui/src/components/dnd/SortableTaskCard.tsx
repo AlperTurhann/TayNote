@@ -30,7 +30,11 @@ const SortableTaskCard = memo(function SortableTaskCard({
     <div
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className="w-full flex"
+      className={
+        isDragging
+          ? 'flex w-full'
+          : 'group flex w-full overflow-hidden rounded-lg border bg-base-700/70 shadow-sm transition-colors hover:border-white/15 hover:bg-base-700'
+      }
     >
       {isDragging ? (
         !hideWhileDragging && <TaskDropPlaceholder />
@@ -40,7 +44,7 @@ const SortableTaskCard = memo(function SortableTaskCard({
             <div
               {...attributes}
               {...listeners}
-              className="flex items-center shrink-0 touch-none cursor-grab rounded-l-lg bg-base-700 text-base-500 hover:bg-base-600 hover:text-base-200 active:cursor-grabbing"
+              className="flex shrink-0 cursor-grab items-center pl-1 text-base-600 touch-none transition-colors hover:text-base-300 active:cursor-grabbing"
               title="Drag to reorder task"
             >
               <GripVertical size={14} />

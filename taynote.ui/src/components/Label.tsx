@@ -45,6 +45,7 @@ interface LabelToggleListProps {
   selectedLabelIds: string[];
   onToggle: (labelId: string) => void;
   emptyMessage?: string;
+  fill?: boolean;
 }
 
 interface LabelFilterBarProps {
@@ -54,7 +55,7 @@ interface LabelFilterBarProps {
 const LabelBadge = ({ label, className }: LabelBadgeProps) => (
   <span
     className={cn(
-      'inline-flex items-center gap-x-1.5 rounded-full bg-base-700 py-0.5 pr-2 pl-1.5 text-xs',
+      'inline-flex items-center gap-x-1.5 rounded-full border border-white/5 bg-white/8 py-0.5 pr-2 pl-1.5 text-xs text-base-200',
       className
     )}
   >
@@ -67,13 +68,17 @@ const LabelToggleList = ({
   labels,
   selectedLabelIds,
   onToggle,
-  emptyMessage = 'No labels available.'
+  emptyMessage = 'No labels available.',
+  fill = false
 }: LabelToggleListProps) => {
   if (labels.length === 0) {
     return <p className="text-sm text-base-400">{emptyMessage}</p>;
   }
   return (
-    <ScrollArea className="w-[calc(100%+8px)] -ml-2" viewportClassName="max-h-48 pl-2">
+    <ScrollArea
+      className={cn('w-[calc(100%+8px)] -ml-2', fill && 'md:min-h-0 md:flex-1')}
+      viewportClassName={cn('max-h-48 pl-2', fill && 'md:max-h-none')}
+    >
       <div className="flex flex-wrap gap-2 pr-2">
         {labels.map((label) => {
           const isSelected = selectedLabelIds.includes(label.id);
@@ -85,8 +90,8 @@ const LabelToggleList = ({
               className={cn(
                 'flex items-center gap-x-2 rounded-full py-1 pr-3 pl-2 text-sm transition-colors',
                 isSelected
-                  ? 'bg-base-600 text-base-100'
-                  : 'bg-base-700/50 text-base-400 hover:bg-base-700 hover:text-base-200'
+                  ? 'bg-indigo-500/20 text-base-100 ring-1 ring-indigo-400/50'
+                  : 'bg-white/5 text-base-300 hover:bg-white/10 hover:text-base-100'
               )}
             >
               <span
@@ -113,7 +118,7 @@ const LabelChip = ({ label }: LabelChipProps) => {
   return (
     <div
       className={cn(
-        'flex items-center gap-x-2 rounded-full bg-base-700 py-1 pr-1 pl-3',
+        'flex items-center gap-x-2 rounded-full border border-white/5 bg-base-700 py-1 pr-1 pl-3',
         label.isDeleting && 'opacity-50'
       )}
     >
@@ -169,25 +174,28 @@ const NewLabelForm = ({ boardId }: NewLabelFormProps) => {
         className="w-full text-base-100"
         disabled={isAdding}
       />
-      <Input<LabelFormData>
-        errors={errors}
-        name="color"
-        register={register}
-        control={control}
-        setValue={setValue}
-        fieldType="color"
-        required
-        disabled={isAdding}
-        className="text-base-100"
-      />
-      <Button
-        colorVariant="green"
-        type="submit"
-        className="shrink-0 rounded self-end px-4 py-1.5"
-        disabled={isAdding}
-      >
-        {isAdding ? <LoadingSpinner /> : <Plus />} New Label
-      </Button>
+      <div className="flex items-start justify-between gap-x-2">
+        <Input<LabelFormData>
+          errors={errors}
+          name="color"
+          register={register}
+          control={control}
+          setValue={setValue}
+          fieldType="color"
+          required
+          disabled={isAdding}
+          className="text-base-100"
+          parentClassName="w-auto min-w-0"
+        />
+        <Button
+          colorVariant="default"
+          type="submit"
+          className="shrink-0 px-3 py-1.5"
+          disabled={isAdding}
+        >
+          {isAdding ? <LoadingSpinner /> : <Plus />} New Label
+        </Button>
+      </div>
     </form>
   );
 };
@@ -222,17 +230,20 @@ const LabelFilterBar = ({ boardId }: LabelFilterBarProps) => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button colorVariant="secondary" className="h-full rounded border gap-x-2">
-          <Tags size={18} />
-          Labels
+        <Button colorVariant="secondary" className="h-9 px-2.5 text-sm" title="Filter by labels">
+          <Tags size={16} />
+          <span className="hidden sm:inline">Labels</span>
           {effectiveLabelIds.length > 0 && (
-            <span className="flex size-5 items-center justify-center rounded-full bg-indigo-600 text-xs">
+            <span className="flex size-5 items-center justify-center rounded-full bg-indigo-500 text-xs text-white">
               {effectiveLabelIds.length}
             </span>
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-72 border-base-600 bg-base-800 text-base-100">
+      <PopoverContent
+        align="start"
+        className="w-72 max-w-[calc(100vw-1.5rem)] border-white/10 bg-base-800 text-base-100"
+      >
         <LabelToggleList
           labels={availableLabels}
           selectedLabelIds={effectiveLabelIds}

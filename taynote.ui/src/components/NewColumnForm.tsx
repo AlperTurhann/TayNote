@@ -33,7 +33,8 @@ const NewColumnForm = ({ boardId }: NewColumnFormProps) => {
   if (!isEditing) {
     return (
       <Button
-        className="h-fit rounded border-2 border-dashed mt-0.5"
+        colorVariant="white"
+        className="h-10 w-[82vw] max-w-80 shrink-0 justify-start rounded-xl border border-dashed mt-0.5 border-white/15 bg-transparent px-4 text-base-300 hover:border-white/30 hover:bg-white/5 hover:text-base-100 sm:w-72"
         onClick={() => setIsEditing(true)}
       >
         <Plus /> New Column
@@ -44,7 +45,7 @@ const NewColumnForm = ({ boardId }: NewColumnFormProps) => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="w-64 h-fit shrink-0 flex flex-col rounded border-2 border-dashed mt-0.5 p-2 gap-y-1 bg-indigo-950"
+      className="flex h-fit w-[82vw] max-w-80 shrink-0 flex-col gap-y-2 rounded-xl border mt-0.5 bg-base-800 p-3 sm:w-72"
     >
       <Input<ColumnFormData>
         errors={errors}
@@ -56,10 +57,10 @@ const NewColumnForm = ({ boardId }: NewColumnFormProps) => {
         autoFocus
       />
       <div className="grid grid-cols-2 gap-x-2">
-        <Button colorVariant="green" type="submit" className="rounded">
+        <Button colorVariant="default" type="submit">
           Add
         </Button>
-        <Button colorVariant="base" className="rounded" onClick={() => setIsEditing(false)}>
+        <Button colorVariant="base" onClick={() => setIsEditing(false)}>
           Cancel
         </Button>
       </div>

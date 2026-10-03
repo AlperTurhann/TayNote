@@ -170,7 +170,7 @@ const Board = ({ boardId }: BoardProps) => {
 
   return (
     <>
-      <div className="flex items-center px-2 gap-x-2">
+      <div className="flex flex-wrap items-stretch gap-2 sm:px-1">
         <TaskSearchBar />
         <LabelFilterBar boardId={boardId} />
         <ClearFiltersButton />
@@ -184,7 +184,7 @@ const Board = ({ boardId }: BoardProps) => {
         onDragCancel={handleDragCancel}
       >
         <ScrollArea className="flex-1 min-h-0" viewportClassName="[&>div]:h-full [&>div]:block!">
-          <div className="size-full flex p-2 pb-4 gap-x-4">
+          <div className="size-full flex gap-x-3 px-1 pb-4 sm:gap-x-4">
             {isLoading && columns.length === 0 ? (
               SKELETON_KEYS.map((key) => <ColumnSkeleton key={key} />)
             ) : (

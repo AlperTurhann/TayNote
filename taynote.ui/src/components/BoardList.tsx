@@ -49,13 +49,13 @@ interface BoardDragOverlayProps {
 }
 
 const BoardSkeleton = () => {
-  return <Skeleton className="h-9 rounded-none bg-base-700" />;
+  return <Skeleton className="h-11 rounded-lg bg-base-700/70" />;
 };
 
 const BoardDragOverlay = ({ name }: BoardDragOverlayProps) => {
   return (
-    <div className="h-9 flex items-center border bg-base-700 px-4">
-      <p className="font-bold text-base-100">{name}</p>
+    <div className="flex h-11 items-center rounded-lg border bg-base-700 px-4 shadow-2xl">
+      <p className="font-medium text-base-100">{name}</p>
     </div>
   );
 };
@@ -94,7 +94,7 @@ const BoardLink = ({ board }: BoardButtonProps) => {
   };
 
   return (
-    <div className={cn('w-full flex', (isUpdating || isDeleting) && 'opacity-50')}>
+    <div className={cn('flex w-full gap-x-1', (isUpdating || isDeleting) && 'opacity-50')}>
       {isEditingName ? (
         <>
           <div className="w-full relative">
@@ -111,7 +111,7 @@ const BoardLink = ({ board }: BoardButtonProps) => {
                 if (e.key === 'Escape') cancelEditing();
               }}
               iconError
-              className="w-full rounded-none font-bold p-2 bg-base-700 text-base-100"
+              className="w-full text-base-100"
               disabled={isUpdating || isDeleting}
             />
             {isUpdating && (
@@ -120,6 +120,7 @@ const BoardLink = ({ board }: BoardButtonProps) => {
           </div>
           <Button
             colorVariant="green"
+            className="size-11 shrink-0 p-0"
             onPointerDown={(e) => e.preventDefault()}
             onClick={confirmEditing}
             disabled={isUpdating}
@@ -129,6 +130,7 @@ const BoardLink = ({ board }: BoardButtonProps) => {
           </Button>
           <Button
             colorVariant="red"
+            className="size-11 shrink-0 p-0"
             onPointerDown={(e) => e.preventDefault()}
             onClick={cancelEditing}
             disabled={isUpdating}
@@ -142,13 +144,18 @@ const BoardLink = ({ board }: BoardButtonProps) => {
           <LinkButton
             href={isDeleting ? '' : `/board/${board.id}`}
             colorVariant="secondary"
-            className="w-full justify-between px-4"
+            className="h-11 w-full justify-between px-4 font-medium"
           >
             {board.name}{' '}
-            {isUpdating || isDeleting ? <LoadingSpinner className="size-5" /> : <ArrowUpRight />}
+            {isUpdating || isDeleting ? (
+              <LoadingSpinner className="size-5" />
+            ) : (
+              <ArrowUpRight size={18} className="text-base-400" />
+            )}
           </LinkButton>
           <Button
-            colorVariant="white"
+            colorVariant="ghost"
+            className="size-11 shrink-0 p-0"
             onClick={() => setIsEditingName(true)}
             disabled={isUpdating || isDeleting}
             title="Rename board"
@@ -157,7 +164,12 @@ const BoardLink = ({ board }: BoardButtonProps) => {
           </Button>
           <VerificationRequiredButton
             button={
-              <Button colorVariant="red" disabled={isDeleting} title="Delete board">
+              <Button
+                colorVariant="ghost"
+                className="size-11 shrink-0 p-0 hover:bg-red-500/15 hover:text-red-300"
+                disabled={isDeleting}
+                title="Delete board"
+              >
                 <Trash2 />
               </Button>
             }
@@ -208,8 +220,9 @@ const BoardList = () => {
   const handleDragCancel = () => setActiveLabel(null);
 
   return (
-    <section className="container min-h-0 flex-1 grid grid-cols-2 gap-px bg-white">
-      <div className="flex flex-col min-h-0 p-6 gap-y-2 bg-base-900">
+    <section className="mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col gap-4 overflow-y-auto lg:grid lg:grid-cols-2 lg:grid-rows-[minmax(0,1fr)] lg:overflow-hidden">
+      <div className="flex shrink-0 flex-col gap-y-3 rounded-xl border bg-base-800/60 p-4 sm:p-5 lg:min-h-0 lg:shrink">
+        <h2 className="text-xs font-semibold tracking-wider text-base-400 uppercase">Boards</h2>
         <NewBoardForm />
         <ScrollArea className="w-[calc(100%+8px)] min-h-0 -ml-2" viewportClassName="pl-2">
           <DndContext
@@ -237,8 +250,10 @@ const BoardList = () => {
           </DndContext>
         </ScrollArea>
       </div>
-      <div className="flex min-h-0 flex-col gap-y-2 p-6 bg-base-900">
-        <h2 className="font-bold text-base-100">Global Labels</h2>
+      <div className="flex shrink-0 flex-col gap-y-3 rounded-xl border bg-base-800/60 p-4 sm:p-5 lg:min-h-0 lg:shrink">
+        <h2 className="text-xs font-semibold tracking-wider text-base-400 uppercase">
+          Global labels
+        </h2>
         <NewLabelForm />
         <ScrollArea className="w-[calc(100%+8px)] min-h-0 -ml-2" viewportClassName="pl-2">
           <div className="flex flex-wrap gap-2">

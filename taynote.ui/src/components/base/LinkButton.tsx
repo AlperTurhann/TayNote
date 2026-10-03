@@ -5,18 +5,19 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 
 const linkVariants = cva(
-  'flex items-center justify-center whitespace-nowrap font-bold p-2 gap-x-1 text-base-100 disabled:pointer-events-none disabled:opacity-50',
+  'flex items-center justify-center whitespace-nowrap font-medium p-2 gap-x-1.5 rounded-md text-base-100 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/70 disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       color: {
-        default: 'bg-indigo-950 hover:bg-indigo-800',
-        secondary: 'bg-base-700 hover:bg-base-600',
-        green: 'bg-green-900 hover:bg-green-800',
-        red: 'bg-red-950 hover:bg-red-900',
-        white: 'bg-white/10 hover:bg-white/20',
-        base: 'bg-base-600 hover:bg-base-500',
-        ghost: 'hover:bg-white/20',
-        darkGhost: 'hover:bg-gray-900/20'
+        default: 'bg-indigo-600 hover:bg-indigo-500',
+        secondary: 'bg-base-700 hover:bg-base-600 border border-white/5',
+        green: 'bg-emerald-600 hover:bg-emerald-500',
+        red: 'bg-red-500/15 text-red-300 hover:bg-red-500/25',
+        white: 'bg-white/8 hover:bg-white/15',
+        base: 'bg-base-700 hover:bg-base-600',
+        ghost: 'text-base-300 hover:bg-white/10 hover:text-base-100',
+        darkGhost: 'hover:bg-black/20',
+        foreground: 'text-base-300 hover:text-white'
       }
     },
     defaultVariants: {

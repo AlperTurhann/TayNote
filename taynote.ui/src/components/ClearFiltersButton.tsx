@@ -20,12 +20,12 @@ const ClearFiltersButton = () => {
   return (
     <Button
       colorVariant="secondary"
-      className="rounded border gap-x-2"
+      className="h-9 px-2.5 text-sm"
       onClick={onClearFilters}
       title="Clear all filters and sorting"
     >
-      <RotateCcw size={18} />
-      Clear Filters
+      <RotateCcw size={16} />
+      <span className="hidden sm:inline">Clear filters</span>
     </Button>
   );
 };

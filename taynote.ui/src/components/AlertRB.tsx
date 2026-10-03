@@ -58,7 +58,7 @@ const AlertItem = ({ alertInfo, bottom, hideAlert, onHeightChange }: AlertItemPr
     <Alert
       ref={elementRef}
       variant={`${alertInfo.type === 'failure' ? 'destructive' : 'default'}`}
-      className="fixed right-3 z-50 w-[95%] transition-[bottom,color] duration-300 bg-base-100 hover:brightness-125 sm:w-1/2 md:w-1/3 lg:w-1/4"
+      className="fixed right-3 z-50 w-[95%] transition-[bottom,color] duration-300 bg-base-800 shadow-xl sm:w-1/2 md:w-1/3 lg:w-1/4"
       style={{ bottom: `${bottom}px` }}
       onMouseEnter={stopTimer}
       onMouseLeave={startTimer}
@@ -68,7 +68,7 @@ const AlertItem = ({ alertInfo, bottom, hideAlert, onHeightChange }: AlertItemPr
       <AlertDescription className="text-xs lg:text-sm">{alertInfo.description}</AlertDescription>
       <Button
         colorVariant="darkGhost"
-        className="absolute top-1 right-1 rounded-full p-1 text-destructive"
+        className="absolute top-1 right-1 rounded-full p-1 text-current"
         onClick={() => hideAlert(alertInfo.id)}
         title="Dismiss notification"
       >

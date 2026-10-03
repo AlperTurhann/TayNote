@@ -30,10 +30,14 @@ const BoardSelector = () => {
   if (!boardId) return;
   return (
     <Select value={boardId} onValueChange={onValueChange}>
-      <SelectTrigger className="font-bold">
+      <SelectTrigger className="max-w-40 min-w-0 border-white/10 bg-base-800 font-medium text-base-100 hover:bg-base-700 sm:max-w-64">
         <SelectValue placeholder="Board Name" />
       </SelectTrigger>
-      <SelectContent className="bg-base-800 text-base-300">
+      <SelectContent
+        position="popper"
+        align="end"
+        className="border-white/10 bg-base-800 text-base-200"
+      >
         {boards.map((board) => (
           <SelectItem key={board.id} value={board.id}>
             <p>{board.name}</p>

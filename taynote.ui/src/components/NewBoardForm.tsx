@@ -27,25 +27,26 @@ const NewBoardForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex items-center justify-between">
+    <form onSubmit={handleSubmit(onSubmit)} className="flex items-start gap-x-2">
       <Input<BoardFormData>
         errors={errors}
-        label="Name"
+        label="New board"
         name="name"
         register={register}
         required
-        placeholder="Board Name"
-        autoFocus
-        className="rounded-r-none text-base-100"
+        placeholder="Board name"
+        className="text-base-100"
         disabled={isCreating}
       />
       <Button
-        colorVariant="white"
+        colorVariant="default"
         type="submit"
-        className="shrink-0 rounded-r-lg mt-1"
+        className="mt-7 shrink-0 px-3 sm:px-4"
+        title="New board"
         disabled={isCreating}
       >
-        {isCreating ? <LoadingSpinner /> : <Plus />} New Board
+        {isCreating ? <LoadingSpinner className="size-4.5" /> : <Plus size={18} />}
+        <span className="hidden sm:inline">New Board</span>
       </Button>
     </form>
   );

@@ -49,20 +49,20 @@ const TaskColorSwatch = ({ task, disabled }: TaskColorSwatchProps) => {
       onBlur={commitColor}
       aria-label="Task color"
       title="Change task color"
-      className="absolute inset-y-0 left-0 w-2 h-full shrink-0 cursor-pointer appearance-none border-0 bg-transparent p-0 outline-none transition-[width] duration-150 hover:w-3 disabled:cursor-not-allowed [&::-webkit-color-swatch]:w-full [&::-webkit-color-swatch]:border-0 [&::-webkit-color-swatch-wrapper]:h-full [&::-webkit-color-swatch-wrapper]:w-full [&::-webkit-color-swatch-wrapper]:p-0 [&::-moz-color-swatch]:h-full [&::-moz-color-swatch]:w-full [&::-moz-color-swatch]:border-0"
+      className="absolute inset-y-0 left-0 h-full w-1.5 shrink-0 cursor-pointer appearance-none border-0 bg-transparent p-0 outline-none transition-[width] duration-150 hover:w-2.5 disabled:cursor-not-allowed [&::-webkit-color-swatch]:w-full [&::-webkit-color-swatch]:border-0 [&::-webkit-color-swatch-wrapper]:h-full [&::-webkit-color-swatch-wrapper]:w-full [&::-webkit-color-swatch-wrapper]:p-0 [&::-moz-color-swatch]:h-full [&::-moz-color-swatch]:w-full [&::-moz-color-swatch]:border-0"
     />
   );
 };
 
 const TaskCardSkeleton = () => {
   return (
-    <div className="w-full flex flex-col p-2 gap-y-2 border-l-4 border-base-600 bg-base-700">
+    <div className="flex w-full flex-col gap-y-2 rounded-lg border bg-base-700/60 p-3">
       <div className="flex justify-between gap-x-2">
-        <Skeleton className="h-4 w-2/3 bg-base-600" />
-        <Skeleton className="size-6 rounded-full bg-base-600" />
+        <Skeleton className="h-4 w-2/3 bg-base-600/60" />
+        <Skeleton className="size-5 rounded-full bg-base-600/60" />
       </div>
       <div className="flex justify-end">
-        <Skeleton className="size-6 rounded-full bg-base-600" />
+        <Skeleton className="size-5 rounded-full bg-base-600/60" />
       </div>
     </div>
   );
@@ -70,7 +70,7 @@ const TaskCardSkeleton = () => {
 
 const TaskDropPlaceholder = () => {
   return (
-    <div className="w-full h-14 shrink-0 rounded-l-lg border-2 border-dashed border-indigo-500/50" />
+    <div className="h-14 w-full shrink-0 rounded-lg border-2 border-dashed border-indigo-500/40 bg-indigo-500/5" />
   );
 };
 
@@ -78,8 +78,8 @@ const TaskDragOverlay = (task: Task) => {
   return (
     <div
       className={cn(
-        'w-full relative flex flex-col transition-colors duration-200 p-2 gap-y-2 border-l-4',
-        task.completed ? 'bg-base-950' : 'bg-base-700'
+        'relative w-full overflow-hidden rounded-lg border border-l-4 p-3 shadow-2xl',
+        task.completed ? 'bg-base-900' : 'bg-base-700'
       )}
       style={{ borderLeftColor: task.color }}
     >
@@ -141,8 +141,8 @@ const TaskCard = ({ task }: TaskCardProps) => {
   return (
     <div
       className={cn(
-        'w-full relative flex flex-col transition-colors duration-200 p-2 pl-4 gap-y-2',
-        task.completed ? 'bg-base-900/50' : 'bg-base-700',
+        'group/card relative flex min-w-0 flex-1 flex-col gap-y-2 py-2 pr-2 pl-3 transition-colors duration-200',
+        task.completed && 'bg-black/20',
         (isUpdating || isDeleting) && 'opacity-50'
       )}
     >
@@ -167,16 +167,17 @@ const TaskCard = ({ task }: TaskCardProps) => {
           iconError
           fieldType="textarea"
           className={cn(
-            'w-full field-sizing-content resize-none rounded-none border-none shadow-none p-1 font-bold bg-transparentx text-base-100 disabled:opacity-100 disabled:cursor-default',
-            isEditingTitle && 'ring'
+            'w-full field-sizing-content resize-none rounded-md border-transparent bg-transparent px-1.5 py-1 text-sm font-medium text-base-100 shadow-none disabled:cursor-default disabled:opacity-100',
+            task.completed && 'text-base-400 line-through',
+            isEditingTitle && 'border-indigo-400 bg-base-900/60 ring-2 ring-indigo-500/30'
           )}
         />
-        <div className="h-fit flex items-center">
+        <div className="flex h-fit items-center [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:transition-opacity group-hover/card:opacity-100 group-focus-within/card:opacity-100">
           {isEditingTitle ? (
             <>
               <Button
                 colorVariant="green"
-                className="size-7 border"
+                className="size-7 p-0"
                 onPointerDown={(e) => e.preventDefault()}
                 onClick={confirmEditingTitle}
                 disabled={isUpdating}
@@ -186,7 +187,7 @@ const TaskCard = ({ task }: TaskCardProps) => {
               </Button>
               <Button
                 colorVariant="red"
-                className="size-7 border"
+                className="size-7 p-0"
                 onPointerDown={(e) => e.preventDefault()}
                 onClick={cancelEditingTitle}
                 title="Cancel title edit"
@@ -200,7 +201,7 @@ const TaskCard = ({ task }: TaskCardProps) => {
                 mode="view"
                 task={taskData}
                 button={
-                  <Button colorVariant="ghost" className="rounded-full p-1" title="Task details">
+                  <Button colorVariant="ghost" className="p-1.5" title="Task details">
                     <Maximize2 size={14} />
                   </Button>
                 }
@@ -209,7 +210,7 @@ const TaskCard = ({ task }: TaskCardProps) => {
                 button={
                   <Button
                     colorVariant="ghost"
-                    className="rounded-full p-1"
+                    className="p-1.5 hover:bg-red-500/15 hover:text-red-300"
                     disabled={isDeleting}
                     title="Delete task"
                   >
@@ -229,23 +230,22 @@ const TaskCard = ({ task }: TaskCardProps) => {
           {task.labels.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {task.labels.map((label) => (
-                <LabelBadge
-                  key={label.id}
-                  label={label}
-                  className={cn(task.completed ? 'bg-base-700' : 'bg-base-600')}
-                />
+                <LabelBadge key={label.id} label={label} />
               ))}
             </div>
           )}
         </div>
         <Button
           colorVariant="ghost"
-          className={cn('rounded-full p-0', task.completed && 'bg-green-900')}
+          className={cn(
+            'rounded-full p-1',
+            task.completed && 'bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30'
+          )}
           onClick={onCompleteTask}
           disabled={isUpdating || isEditingTitle}
           title={task.completed ? 'Mark as incomplete' : 'Mark as complete'}
         >
-          <CheckCircle2 />
+          <CheckCircle2 size={18} />
         </Button>
       </div>
     </div>

@@ -28,12 +28,12 @@ const VerificationRequiredButton = ({
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>{button}</AlertDialogTrigger>
-      <AlertDialogContent className="w-96 p-0 bg-base-950">
+      <AlertDialogContent className="max-w-sm gap-0 p-0 sm:max-w-sm">
         <AlertDialogHeader className="p-6">
           <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter className="rounded-b-lg border-t p-4 bg-base-900">
+        <AlertDialogFooter className="rounded-b-xl border-t bg-base-900/60 p-4">
           <AlertDialogCancel variant="secondary">Cancel</AlertDialogCancel>
           <AlertDialogAction variant="destructive" onClick={handleAccept}>
             Continue

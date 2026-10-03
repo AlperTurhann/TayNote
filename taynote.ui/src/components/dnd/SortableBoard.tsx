@@ -24,7 +24,7 @@ const SortableBoard = memo(function SortableBoard({ board }: SortableBoardProps)
         style={{ transform: CSS.Transform.toString(transform), transition }}
         className="relative w-full"
       >
-        <div className="absolute inset-0 border-2 border-dashed border-indigo-500/50" />
+        <div className="absolute inset-0 rounded-lg border-2 border-dashed border-indigo-500/40 bg-indigo-500/5" />
         <div className="invisible">
           <BoardLink board={board} />
         </div>
@@ -36,12 +36,12 @@ const SortableBoard = memo(function SortableBoard({ board }: SortableBoardProps)
     <div
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className="w-full flex"
+      className="flex w-full items-center"
     >
       <div
         {...attributes}
         {...listeners}
-        className="flex items-center shrink-0 touch-none cursor-grab bg-base-700 text-base-500 hover:bg-base-600 hover:text-base-200 active:cursor-grabbing"
+        className="flex h-11 shrink-0 cursor-grab items-center px-1 text-base-500 touch-none transition-colors hover:text-base-200 active:cursor-grabbing"
         title="Drag to reorder board"
       >
         <GripVertical size={14} />

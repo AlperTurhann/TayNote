@@ -49,20 +49,22 @@ const TaskSearchBar = () => {
   return (
     <form
       onSubmit={handleSubmit((data) => onSubmit(data.query))}
-      className="w-fit h-full flex items-center rounded border gap-x-2 bg-base-600"
+      role="search"
+      className="flex h-9 min-w-48 flex-1 items-center rounded-md border border-white/10 bg-base-800 transition-colors focus-within:border-indigo-400 focus-within:ring-2 focus-within:ring-indigo-500/30 sm:max-w-sm"
     >
       <Button
-        colorVariant="white"
+        colorVariant="ghost"
         type="submit"
-        className="h-full shrink-0 rounded-l p-2"
+        className="h-full shrink-0 rounded-r-none px-2.5"
         title="Search board"
       >
-        <Search size={20} />
+        <Search size={16} />
       </Button>
       <input
         {...register('query')}
         placeholder="Search board"
-        className="pr-4 focus:outline-none"
+        aria-label="Search board"
+        className="h-full min-w-0 flex-1 bg-transparent pr-3 text-sm text-base-100 outline-none placeholder:text-base-500"
       />
     </form>
   );
@@ -106,25 +108,27 @@ const ColumnSearchBar = ({ columnId, isLoading = false }: ColumnSearchBarProps) 
   return (
     <form
       onSubmit={handleSubmit((data) => onSubmit(data.query))}
+      role="search"
       className={cn(
-        'flex items-center justify-between border gap-x-2 bg-base-600',
-        isLoading && 'opacity-100'
+        'mx-2 mb-2 flex h-8 items-center rounded-md border border-white/10 bg-base-900/60 transition-colors focus-within:border-indigo-400 focus-within:ring-2 focus-within:ring-indigo-500/30',
+        isLoading && 'opacity-70'
       )}
     >
       <input
         {...register('query')}
-        placeholder="Search column"
-        className="w-full px-4 focus:outline-none"
+        placeholder="Filter tasks"
+        aria-label="Search column"
+        className="h-full min-w-0 flex-1 bg-transparent px-2.5 text-sm text-base-100 outline-none placeholder:text-base-500"
         disabled={isLoading}
       />
       <Button
-        colorVariant="white"
+        colorVariant="ghost"
         type="submit"
-        className="shrink-0"
+        className="h-full shrink-0 rounded-l-none px-2"
         disabled={isLoading}
         title="Search column"
       >
-        {isLoading ? <LoadingSpinner className="size-5" /> : <Search size={20} />}
+        {isLoading ? <LoadingSpinner className="size-4" /> : <Search size={14} />}
       </Button>
     </form>
   );
